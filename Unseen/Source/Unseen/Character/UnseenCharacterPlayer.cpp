@@ -7,6 +7,8 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "AbilitySystemComponent.h"
+#include "Player/UnseenPlayerState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 AUnseenCharacterPlayer::AUnseenCharacterPlayer()
@@ -21,6 +23,9 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+
+	// Get Ability System from PlayerState
+	ASC = nullptr;
 
 	// Input
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/ThirdPerson/Input/IMC_Default.IMC_Default'"));
@@ -54,6 +59,28 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	}
 }
 
+void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	AUnseenPlayerState* UnseenPlayerState = GetPlayerState<AUnseenPlayerState>();
+	if (UnseenPlayerState)
+	{
+		ASC = UnseenPlayerState->GetAbilitySystemComponent();
+		ASC->InitAbilityActorInfo(UnseenPlayerState, this);
+
+		int32 InputId = 0;
+		for (const auto& StartAbility : StartAbilities)
+		{
+			FGameplayAbilitySpec StartSpec(StartAbility);
+			StartSpec.InputID = InputId++;
+			ASC->GiveAbility(StartSpec);
+
+			SetupGASInputComponent();
+		}
+	}
+}
+
 void AUnseenCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -72,12 +99,14 @@ void AUnseenCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Pl
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	SetupGASInputComponent();
+
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 
 		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::Move);
@@ -145,3 +174,56 @@ void AUnseenCharacterPlayer::StopSprinting()
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 }
 
+
+//Ability System
+UAbilitySystemComponent* AUnseenCharacterPlayer::GetAbilitySystemComponent() const
+{
+	return ASC;
+}
+
+void AUnseenCharacterPlayer::SetupGASInputComponent()
+{
+	if (IsValid(ASC) && IsValid(InputComponent))
+	{
+		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 0);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 0);
+		
+	}
+}
+
+void AUnseenCharacterPlayer::GASInputPressed(int32 InputId)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Log Message"));
+
+	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
+	if (Spec)
+	{
+		Spec->InputPressed = true;
+		// Ability already active
+		if (Spec->IsActive())
+		{
+			ASC->AbilitySpecInputPressed(*Spec);
+		}
+		// Ability not active
+		else
+		{
+			ASC->TryActivateAbility(Spec->Handle);
+		}
+	}
+}
+
+void AUnseenCharacterPlayer::GASInputReleased(int32 InputId)
+{
+	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
+	if (Spec)
+	{
+		Spec->InputPressed = false;
+		// Ability already active
+		if (Spec->IsActive())
+		{
+			ASC->AbilitySpecInputReleased(*Spec);
+		}
+	}
+}

@@ -5,21 +5,23 @@
 #include "CoreMinimal.h"
 #include "Character/UnseenCharacterBase.h"
 #include "InputActionValue.h"
+#include "AbilitySystemInterface.h"
 #include "UnseenCharacterPlayer.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UNSEEN_API AUnseenCharacterPlayer : public AUnseenCharacterBase
+class UNSEEN_API AUnseenCharacterPlayer : public AUnseenCharacterBase, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 	
 public:
 	AUnseenCharacterPlayer();
+	virtual void PossessedBy(AController* NewController) override;
 
 protected:
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -57,5 +59,20 @@ protected:
 
 	void Sprint();
 	void StopSprinting();
+
+// Ability System
+public:
+	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+protected:
+	void SetupGASInputComponent();
+	void GASInputPressed(int32 InputId);
+	void GASInputReleased(int32 InputId);
+
+	UPROPERTY(EditAnywhere, Category = GAS)
+	TObjectPtr<class UAbilitySystemComponent> ASC;
+
+	UPROPERTY(EditAnywhere, Category = GAS)
+	TArray<TSubclassOf<class UGameplayAbility>> StartAbilities;
 
 };

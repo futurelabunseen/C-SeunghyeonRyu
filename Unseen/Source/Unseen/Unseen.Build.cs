@@ -10,7 +10,7 @@ public class Unseen : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[] { "Unseen" });
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "GameplayAbilities" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

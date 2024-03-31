@@ -5,7 +5,8 @@
 
 AUnseenGameModeBase::AUnseenGameModeBase()
 {
-	static ConstructorHelpers::FClassFinder<APawn> ThirdPersonClassRef(TEXT("/Script/Unseen.UnseenCharacterPlayer"));
+	static ConstructorHelpers::FClassFinder<APawn> ThirdPersonClassRef(TEXT("/Game/Characters/GASUnseen/BP_UnseenCharacterPlayer"));
+	//static ConstructorHelpers::FClassFinder<APawn> ThirdPersonClassRef(TEXT("/Script/Unseen.UnseenCharacterPlayer"));
 	if (ThirdPersonClassRef.Class != nullptr)
 	{
 		DefaultPawnClass = ThirdPersonClassRef.Class;
@@ -16,4 +17,11 @@ AUnseenGameModeBase::AUnseenGameModeBase()
 	{
 		PlayerControllerClass = PlayerControllerClassRef.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<APlayerState> PlayerStateClassRef(TEXT("/Script/Unseen.UnseenPlayerState"));
+	if (PlayerStateClassRef.Class)
+	{
+		PlayerStateClass = PlayerStateClassRef.Class;
+	}
+
 }
