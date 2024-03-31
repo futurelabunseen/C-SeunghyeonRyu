@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 {
@@ -45,6 +46,12 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	{
 		LookAction = InputActionLookRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSprintRef(TEXT("/Script/EnhancedInput.InputAction'/Game/ThirdPerson/Input/Actions/IA_Sprint.IA_Sprint'"));
+	if (nullptr != InputActionSprintRef.Object)
+	{
+		SprintAction = InputActionSprintRef.Object;
+	}
 }
 
 void AUnseenCharacterPlayer::BeginPlay()
@@ -76,6 +83,9 @@ void AUnseenCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Pl
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::Move);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::StopMoving);
 
+		//Sprinting
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::Sprint);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::StopSprinting);
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::Look);
@@ -124,3 +134,14 @@ void AUnseenCharacterPlayer::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
+
+void AUnseenCharacterPlayer::Sprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+}
+
+void AUnseenCharacterPlayer::StopSprinting()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+}
+

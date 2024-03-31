@@ -47,9 +47,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* SprintAction;
+
 	void Move(const FInputActionValue& Value);
 	void StopMoving();
 
 	void Look(const FInputActionValue& Value);
+
+	void Sprint();
+	void StopSprinting();
 
 };
