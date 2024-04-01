@@ -57,6 +57,18 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	{
 		SprintAction = InputActionSprintRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionRollRef(TEXT("/Script/EnhancedInput.InputAction'/Game/ThirdPerson/Input/Actions/IA_Roll.IA_Roll'"));
+	if (nullptr != InputActionRollRef.Object)
+	{
+		RollAction = InputActionRollRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> RollMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/AM_Roll_Rifle.AM_Roll_Rifle'"));
+	if (RollMontageRef.Succeeded())
+	{
+		RollMontage = RollMontageRef.Object;
+	}
 }
 
 void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
@@ -189,6 +201,9 @@ void AUnseenCharacterPlayer::SetupGASInputComponent()
 
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 0);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 0);
+
+		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 1);
+		//EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 1);
 		
 	}
 }

@@ -52,6 +52,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SprintAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* RollAction;
+
 	void Move(const FInputActionValue& Value);
 	void StopMoving();
 
@@ -64,6 +67,9 @@ protected:
 public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+public:
+	FORCEINLINE class UAnimMontage* GetRollMontage() const { return RollMontage; }
+
 protected:
 	void SetupGASInputComponent();
 	void GASInputPressed(int32 InputId);
@@ -74,5 +80,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TArray<TSubclassOf<class UGameplayAbility>> StartAbilities;
+
+	
+// Montage
+	UPROPERTY(EditAnywhere, Category = Animation)
+	TObjectPtr<class UAnimMontage> RollMontage;
 
 };
