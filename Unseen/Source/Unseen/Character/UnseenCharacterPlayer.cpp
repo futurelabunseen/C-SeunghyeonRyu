@@ -195,8 +195,6 @@ void AUnseenCharacterPlayer::SetupGASInputComponent()
 
 void AUnseenCharacterPlayer::GASInputPressed(int32 InputId)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Log Message"));
-
 	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
 	if (Spec)
 	{
