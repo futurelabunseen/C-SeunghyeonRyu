@@ -47,4 +47,3 @@ AUnseenCharacterBase::AUnseenCharacterBase()
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 }
-

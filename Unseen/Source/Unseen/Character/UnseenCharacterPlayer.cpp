@@ -132,8 +132,8 @@ void AUnseenCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Pl
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::StopMoving);
 
 		//Sprinting
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::Sprint);
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::StopSprinting);
+		//EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::Sprint);
+		//EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::StopSprinting);
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::Look);
@@ -183,7 +183,14 @@ void AUnseenCharacterPlayer::Look(const FInputActionValue& Value)
 
 void AUnseenCharacterPlayer::Sprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	FVector CharacterForward = GetActorForwardVector();
+	FVector VelocityDirection = GetVelocity().GetSafeNormal();
+	float MovementDirection = FVector::DotProduct(CharacterForward, VelocityDirection);
+
+	if (!GetCharacterMovement()->Velocity.IsNearlyZero() && MovementDirection > 0.5)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	}
 }
 
 void AUnseenCharacterPlayer::StopSprinting()
@@ -214,6 +221,9 @@ void AUnseenCharacterPlayer::SetupGASInputComponent()
 
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 3);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 3);
+
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 4);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 4);
 		
 	}
 }

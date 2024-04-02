@@ -45,6 +45,11 @@ bool UGA_Roll::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 
 void UGA_Roll::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
+	if (ScopeLockCount > 0)
+	{
+		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &UGA_Roll::CancelAbility, Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility));
+		return;
+	}
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 	
 }
@@ -56,10 +61,6 @@ void UGA_Roll::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGamepl
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 	UnseenCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	UnseenCharacter->bUseControllerRotationYaw = true;
-}
-
-void UGA_Roll::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
-{
 }
 
 void UGA_Roll::OnCompleteCallback()
