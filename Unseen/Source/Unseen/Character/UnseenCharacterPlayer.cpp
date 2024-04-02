@@ -69,6 +69,12 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	{
 		RollMontage = RollMontageRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> StepBackMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/AM_Step_Back.AM_Step_Back'"));
+	if (StepBackMontageRef.Succeeded())
+	{
+		StepBackMontage = StepBackMontageRef.Object;
+	}
 }
 
 void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
@@ -81,15 +87,20 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 		ASC = UnseenPlayerState->GetAbilitySystemComponent();
 		ASC->InitAbilityActorInfo(UnseenPlayerState, this);
 
-		int32 InputId = 0;
 		for (const auto& StartAbility : StartAbilities)
 		{
 			FGameplayAbilitySpec StartSpec(StartAbility);
-			StartSpec.InputID = InputId++;
 			ASC->GiveAbility(StartSpec);
-
-			SetupGASInputComponent();
 		}
+
+		for (const auto& StartInputAbility : StartInputAbilities)
+		{
+			FGameplayAbilitySpec StartSpec(StartInputAbility.Value);
+			StartSpec.InputID = StartInputAbility.Key;
+			ASC->GiveAbility(StartSpec);
+		}
+
+		SetupGASInputComponent();
 	}
 }
 
@@ -116,10 +127,6 @@ void AUnseenCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Pl
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 
-		//Jumping
-		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::Move);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::StopMoving);
@@ -135,8 +142,6 @@ void AUnseenCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Pl
 
 void AUnseenCharacterPlayer::Move(const FInputActionValue& Value)
 {
-	bUseControllerRotationYaw = true;
-
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
@@ -203,7 +208,12 @@ void AUnseenCharacterPlayer::SetupGASInputComponent()
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 0);
 
 		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 1);
-		//EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 1);
+
+		// Step_Back 
+		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 2);
+
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 3);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 3);
 		
 	}
 }

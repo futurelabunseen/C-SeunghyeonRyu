@@ -4,25 +4,33 @@
 #include "AbilitySystem/Abilities/GA_Roll.h"
 #include "Character/UnseenCharacterPlayer.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UGA_Roll::UGA_Roll()
 {
-	// 일단 싱글 플레이어로 만드는 동안은 NonInstanced.
-	InstancingPolicy = EGameplayAbilityInstancingPolicy::NonInstanced;
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+
+	ActivationRequiredTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsMoving"));
+	ActivationOwnedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsRolling"));
+
 }
 
 void UGA_Roll::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-	
-	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 
-	
+	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+	UnseenCharacter->bUseControllerRotationYaw = false;
+
+	UnseenCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	UnseenCharacter->SetActorRotation(FRotationMatrix::MakeFromX(UnseenCharacter->GetCharacterMovement()->GetLastInputVector()).Rotator());
+
 	UAbilityTask_PlayMontageAndWait* PlayRollTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayRoll"), UnseenCharacter->GetRollMontage());
+
 	PlayRollTask->OnCompleted.AddDynamic(this, &UGA_Roll::OnCompleteCallback);
 	PlayRollTask->OnInterrupted.AddDynamic(this, &UGA_Roll::OnInterruptedCallback);
 	PlayRollTask->ReadyForActivation();
-
+	
 }
 
 bool UGA_Roll::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
@@ -32,27 +40,22 @@ bool UGA_Roll::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 		return false;
 	}
 
-	return false;
-	/*
-	const ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
-	return (Character && Character->CanJump());
-	*/
+	return true;
 }
 
 void UGA_Roll::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 	
-	/*
-	ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
-	Character->StopJumping();
-	*/
 }
 
 void UGA_Roll::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
+	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+	UnseenCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	UnseenCharacter->bUseControllerRotationYaw = true;
 }
 
 void UGA_Roll::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)

@@ -69,6 +69,7 @@ public:
 
 public:
 	FORCEINLINE class UAnimMontage* GetRollMontage() const { return RollMontage; }
+	FORCEINLINE class UAnimMontage* GetStepBackMontage() const { return StepBackMontage; }
 
 protected:
 	void SetupGASInputComponent();
@@ -81,9 +82,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TArray<TSubclassOf<class UGameplayAbility>> StartAbilities;
 
+	UPROPERTY(EditAnywhere, Category = GAS)
+	TMap<int32, TSubclassOf<class UGameplayAbility>> StartInputAbilities;
+
 	
 // Montage
 	UPROPERTY(EditAnywhere, Category = Animation)
 	TObjectPtr<class UAnimMontage> RollMontage;
+
+	UPROPERTY(EditAnywhere, Category = Animation)
+	TObjectPtr<class UAnimMontage> StepBackMontage;
 
 };
