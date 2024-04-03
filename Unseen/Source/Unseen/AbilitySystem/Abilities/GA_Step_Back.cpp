@@ -20,9 +20,12 @@ void UGA_Step_Back::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
-	UnseenCharacter->bUseControllerRotationYaw = false;
-
+	
 	UnseenCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	//여기 앞벡터 가져와서 회전하게
+	UnseenCharacter->SetActorRotation(FRotationMatrix::MakeFromX(UnseenCharacter->GetCharacterMovement()->GetLastInputVector()).Rotator());
+	
+	UnseenCharacter->bUseControllerRotationYaw = false;
 
 	UAbilityTask_PlayMontageAndWait* PlayStepBackTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayStepBack"), UnseenCharacter->GetStepBackMontage());
 
@@ -46,10 +49,6 @@ void UGA_Step_Back::CancelAbility(const FGameplayAbilitySpecHandle Handle, const
 {
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 
-	/*
-	ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
-	Character->StopJumping();
-	*/
 }
 
 void UGA_Step_Back::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
@@ -58,7 +57,7 @@ void UGA_Step_Back::EndAbility(const FGameplayAbilitySpecHandle Handle, const FG
 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 	UnseenCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	UnseenCharacter->bUseControllerRotationYaw = true;
+
 }
 
 

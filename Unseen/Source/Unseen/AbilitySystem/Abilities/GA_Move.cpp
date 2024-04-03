@@ -12,6 +12,7 @@ UGA_Move::UGA_Move()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 
+	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag("Character.Action.Move"));
 	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsRolling"));
 	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsStepBack"));
 	ActivationOwnedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsMoving"));
@@ -42,7 +43,6 @@ void UGA_Move::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGam
 		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &UGA_Move::CancelAbility, Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility));
 		return;
 	}
-
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 
