@@ -252,7 +252,6 @@ void AUnseenCharacterPlayer::GASInputReleased(int32 InputId)
 	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
 	if (Spec)
 	{
-		Spec->InputPressed = false;
 		// Ability already active
 		if (Spec->IsActive())
 		{

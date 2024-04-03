@@ -19,7 +19,7 @@ UGA_Sprint::UGA_Sprint()
 void UGA_Sprint::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
+	
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 
 	UnseenCharacter->GetCharacterMovement()->MaxWalkSpeed = 500.f;
@@ -38,7 +38,7 @@ bool UGA_Sprint::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	FVector VelocityDirection = UnseenCharacter->GetVelocity().GetSafeNormal();
 	float MovementDirection = FVector::DotProduct(CharacterForward, VelocityDirection);
 
-	if (MovementDirection > 0.5)
+	if (MovementDirection > -0.1)
 	{
 		return true;
 	}
@@ -57,6 +57,24 @@ void UGA_Sprint::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGame
 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 	UnseenCharacter->GetCharacterMovement()->MaxWalkSpeed = 300.f;
+}
+
+void UGA_Sprint::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
+{
+	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+
+	FVector CharacterForward = UnseenCharacter->GetActorForwardVector();
+	FVector VelocityDirection = UnseenCharacter->GetVelocity().GetSafeNormal();
+	float MovementDirection = FVector::DotProduct(CharacterForward, VelocityDirection);
+
+	if (!UnseenCharacter->GetCharacterMovement()->Velocity.IsNearlyZero() && MovementDirection > -0.1)
+	{
+		Super::InputPressed(Handle, ActorInfo, ActivationInfo);
+	}
+	else
+	{
+		CancelAbility(Handle, ActorInfo, ActivationInfo, true);
+	}
 }
 
 void UGA_Sprint::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)

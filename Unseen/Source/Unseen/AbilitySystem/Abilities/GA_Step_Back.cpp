@@ -61,9 +61,6 @@ void UGA_Step_Back::EndAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	UnseenCharacter->bUseControllerRotationYaw = true;
 }
 
-void UGA_Step_Back::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
-{
-}
 
 void UGA_Step_Back::OnCompleteCallback()
 {
@@ -78,4 +75,3 @@ void UGA_Step_Back::OnInterruptedCallback()
 	bool bWasCancelled = true;
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
 }
-
