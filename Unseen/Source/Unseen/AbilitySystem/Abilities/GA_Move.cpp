@@ -43,6 +43,9 @@ void UGA_Move::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGam
 		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &UGA_Move::CancelAbility, Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility));
 		return;
 	}
+
+	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+	UnseenCharacter->bUseControllerRotationYaw = false;
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 

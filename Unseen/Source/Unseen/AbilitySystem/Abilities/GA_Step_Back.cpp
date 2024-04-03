@@ -24,7 +24,7 @@ void UGA_Step_Back::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	FRotator ControllerRotator(0.f, UnseenCharacter->GetControlRotation().Yaw, 0.f);
 	UnseenCharacter->SetActorRotation(ControllerRotator);
 	
-	UnseenCharacter->bUseControllerRotationYaw = false;
+	///UnseenCharacter->bUseControllerRotationYaw = false;
 
 	UAbilityTask_PlayMontageAndWait* PlayStepBackTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayStepBack"), UnseenCharacter->GetStepBackMontage());
 

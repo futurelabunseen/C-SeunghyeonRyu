@@ -16,7 +16,8 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = 200.0f; // The camera follows at this distance behind the character
+	CameraBoom->SocketOffset = FVector(0.f, 50.f, 40.f);
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -207,7 +208,7 @@ void AUnseenCharacterPlayer::Move(const FInputActionValue& Value)
 
 void AUnseenCharacterPlayer::StopMoving()
 {
-	bUseControllerRotationYaw = false;
+	///bUseControllerRotationYaw = false;
 }
 
 void AUnseenCharacterPlayer::Look(const FInputActionValue& Value)
@@ -245,6 +246,11 @@ void AUnseenCharacterPlayer::StopSprinting()
 UAbilitySystemComponent* AUnseenCharacterPlayer::GetAbilitySystemComponent() const
 {
 	return ASC;
+}
+
+TObjectPtr<class USpringArmComponent> AUnseenCharacterPlayer::GetSpringArmComponent()
+{
+	return CameraBoom;
 }
 
 void AUnseenCharacterPlayer::SetupGASInputComponent()

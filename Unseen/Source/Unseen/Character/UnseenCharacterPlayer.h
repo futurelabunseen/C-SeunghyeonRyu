@@ -70,6 +70,7 @@ protected:
 // Ability System
 public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	TObjectPtr<class USpringArmComponent> GetSpringArmComponent();
 
 public:
 	FORCEINLINE class UAnimMontage* GetRollMontage() const { return RollMontage; }
@@ -136,4 +137,10 @@ public:
 
 	UFUNCTION()
 	UTimelineComponent* GetStepBackTimeline();
+
+public:
+	// Todo #1 : 카메라 줌인 줌아웃 함수 lerp 써서 만들고 Roll이랑 step_back에 넣기
+	
+
+
 };
