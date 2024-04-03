@@ -64,6 +64,12 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 		RollAction = InputActionRollRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionStepBackRef(TEXT("/Script/EnhancedInput.InputAction'/Game/ThirdPerson/Input/Actions/IA_StepBack.IA_StepBack'"));
+	if (nullptr != InputActionStepBackRef.Object)
+	{
+		StepBackAction = InputActionStepBackRef.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> RollMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/AM_Roll_Rifle.AM_Roll_Rifle'"));
 	if (RollMontageRef.Succeeded())
 	{
@@ -75,6 +81,25 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	{
 		StepBackMontage = StepBackMontageRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> RollCurveRef(TEXT("/Script/Engine.CurveFloat'/Game/Animation/FloatCurve_Roll.FloatCurve_Roll'"));
+	if (RollCurveRef.Object)
+	{
+		RollCurve = RollCurveRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> StepBackCurveRef(TEXT("/Script/Engine.CurveFloat'/Game/Animation/FloatCurve_StepBack.FloatCurve_StepBack'"));
+	if (StepBackCurveRef.Object)
+	{
+		StepBackCurve = StepBackCurveRef.Object;
+	}
+
+	RollTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RollTimeline"));
+	RollDistance = 400.f;
+
+	StepBackTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("StepBackTimeline"));
+	StepBackDistance = -400.f;
+
 }
 
 void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
@@ -116,6 +141,18 @@ void AUnseenCharacterPlayer::BeginPlay()
 		//Subsystem->RemoveMappingContext(DefaultMappingContext);
 	}
 
+	// Roll Timeline
+	RollTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnRollTimelineUpdated") });
+	RollTimeline->AddInterpFloat(RollCurve, RollTimeLineInterpFunction);
+	RollTimeline->SetTimelineLength(RollMontage->GetPlayLength());
+	RollTimeline->SetLooping(false);
+	
+	// StepBack Timeline
+	StepBackTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnStepBackTimelineUpdated") });
+	StepBackTimeline->AddInterpFloat(StepBackCurve, StepBackTimeLineInterpFunction);
+	StepBackTimeline->SetTimelineLength(StepBackMontage->GetPlayLength());
+	StepBackTimeline->SetLooping(false);
+
 }
 
 void AUnseenCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -142,24 +179,29 @@ void AUnseenCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Pl
 
 void AUnseenCharacterPlayer::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
+	FGameplayTagContainer CurrentOwnedGameplayTags;
+	ASC->GetOwnedGameplayTags(CurrentOwnedGameplayTags);
+	if (CurrentOwnedGameplayTags.HasTag(FGameplayTag::RequestGameplayTag("Character.State.IsMoving")))
 	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		// input is a Vector2D
+		FVector2D MovementVector = Value.Get<FVector2D>();
 
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		if (Controller != nullptr)
+		{
+			// find out which way is forward
+			const FRotator Rotation = Controller->GetControlRotation();
+			const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+			// get forward vector
+			const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.X);
-		AddMovementInput(RightDirection, MovementVector.Y);
+			// get right vector 
+			const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+			// add movement 
+			AddMovementInput(ForwardDirection, MovementVector.X);
+			AddMovementInput(RightDirection, MovementVector.Y);
+		}
 	}
 }
 
@@ -211,16 +253,15 @@ void AUnseenCharacterPlayer::SetupGASInputComponent()
 	{
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 0);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 0);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 0);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 0);
 
 		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 1);
 
-		// Step_Back 
-		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 2);
+		EnhancedInputComponent->BindAction(StepBackAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 2);
 
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 3);
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 3);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 3);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 3);
 
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 4);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 4);
@@ -258,4 +299,24 @@ void AUnseenCharacterPlayer::GASInputReleased(int32 InputId)
 			ASC->AbilitySpecInputReleased(*Spec);
 		}
 	}
+}
+
+void AUnseenCharacterPlayer::OnRollTimelineUpdated(float Value)
+{
+	GetCharacterMovement()->Velocity = Value * RollDistance * GetActorForwardVector();
+}
+
+void AUnseenCharacterPlayer::OnStepBackTimelineUpdated(float Value)
+{
+	GetCharacterMovement()->Velocity = Value * StepBackDistance * GetActorForwardVector();
+}
+
+UTimelineComponent* AUnseenCharacterPlayer::GetRollTimeline()
+{
+	return RollTimeline;
+}
+
+UTimelineComponent* AUnseenCharacterPlayer::GetStepBackTimeline()
+{
+	return StepBackTimeline;
 }

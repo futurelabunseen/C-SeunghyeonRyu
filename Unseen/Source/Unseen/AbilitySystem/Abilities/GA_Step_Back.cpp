@@ -21,13 +21,14 @@ void UGA_Step_Back::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 	
-	UnseenCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-	//여기 앞벡터 가져와서 회전하게
-	UnseenCharacter->SetActorRotation(FRotationMatrix::MakeFromX(UnseenCharacter->GetCharacterMovement()->GetLastInputVector()).Rotator());
+	FRotator ControllerRotator(0.f, UnseenCharacter->GetControlRotation().Yaw, 0.f);
+	UnseenCharacter->SetActorRotation(ControllerRotator);
 	
 	UnseenCharacter->bUseControllerRotationYaw = false;
 
 	UAbilityTask_PlayMontageAndWait* PlayStepBackTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayStepBack"), UnseenCharacter->GetStepBackMontage());
+
+	UnseenCharacter->GetStepBackTimeline()->PlayFromStart();
 
 	PlayStepBackTask->OnCompleted.AddDynamic(this, &UGA_Step_Back::OnCompleteCallback);
 	PlayStepBackTask->OnInterrupted.AddDynamic(this, &UGA_Step_Back::OnInterruptedCallback);

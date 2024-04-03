@@ -29,4 +29,5 @@ protected:
 
 	UFUNCTION()
 	void OnInterruptedCallback();
+
 };

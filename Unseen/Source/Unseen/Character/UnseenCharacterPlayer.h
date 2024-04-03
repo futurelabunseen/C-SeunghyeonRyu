@@ -6,6 +6,7 @@
 #include "Character/UnseenCharacterBase.h"
 #include "InputActionValue.h"
 #include "AbilitySystemInterface.h"
+#include "Components/TimelineComponent.h"
 #include "UnseenCharacterPlayer.generated.h"
 
 /**
@@ -55,6 +56,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* RollAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* StepBackAction;
+
 	void Move(const FInputActionValue& Value);
 	void StopMoving();
 
@@ -93,4 +97,43 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Animation)
 	TObjectPtr<class UAnimMontage> StepBackMontage;
 
+// Montage Timeline
+	
+// Roll
+	UPROPERTY()
+	UTimelineComponent* RollTimeline;
+
+	UPROPERTY()
+	UCurveFloat* RollCurve;
+
+	UFUNCTION()
+	void OnRollTimelineUpdated(float Value);
+
+	FOnTimelineFloat RollTimeLineInterpFunction{};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
+	float RollDistance;
+
+// StepBack
+	UPROPERTY()
+	UTimelineComponent* StepBackTimeline;
+
+	UPROPERTY()
+	UCurveFloat* StepBackCurve;
+
+	UFUNCTION()
+	void OnStepBackTimelineUpdated(float Value);
+
+	FOnTimelineFloat StepBackTimeLineInterpFunction{};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
+	float StepBackDistance;
+
+
+public:
+	UFUNCTION()
+	UTimelineComponent* GetRollTimeline();
+
+	UFUNCTION()
+	UTimelineComponent* GetStepBackTimeline();
 };
