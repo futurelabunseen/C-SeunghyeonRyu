@@ -27,6 +27,9 @@ void UGA_Step_Back::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	///UnseenCharacter->bUseControllerRotationYaw = false;
 
 	UAbilityTask_PlayMontageAndWait* PlayStepBackTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayStepBack"), UnseenCharacter->GetStepBackMontage());
+	
+	UnseenCharacter->bIsRollStepBackActive = true;
+	UnseenCharacter->RollStepBackCameraLerp();
 
 	UnseenCharacter->GetStepBackTimeline()->PlayFromStart();
 
@@ -57,6 +60,8 @@ void UGA_Step_Back::EndAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+	UnseenCharacter->bIsRollStepBackActive = false;
+	UnseenCharacter->RollStepBackCameraLerp();
 	UnseenCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 
 }

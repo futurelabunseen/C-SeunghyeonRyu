@@ -10,6 +10,7 @@
 #include "AbilitySystemComponent.h"
 #include "Player/UnseenPlayerState.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 {
@@ -95,11 +96,19 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 		StepBackCurve = StepBackCurveRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> RollStepBackCameraCurveRef(TEXT("/Script/Engine.CurveFloat'/Game/Curve/FloatCurve_RollStepBackCamera.FloatCurve_RollStepBackCamera'"));
+	if (RollStepBackCameraCurveRef.Object)
+	{
+		RollStepBackCameraCurve = RollStepBackCameraCurveRef.Object;
+	}
+
 	RollTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RollTimeline"));
 	RollDistance = 400.f;
 
 	StepBackTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("StepBackTimeline"));
 	StepBackDistance = -400.f;
+
+	RollStepBackCameraTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RollStepBackCameraTimeline"));
 
 }
 
@@ -153,6 +162,12 @@ void AUnseenCharacterPlayer::BeginPlay()
 	StepBackTimeline->AddInterpFloat(StepBackCurve, StepBackTimeLineInterpFunction);
 	StepBackTimeline->SetTimelineLength(StepBackMontage->GetPlayLength());
 	StepBackTimeline->SetLooping(false);
+
+	// StepBack Timeline
+	RollStepBackCameraTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnRollStepBackCameraTimelineUpdated") });
+	RollStepBackCameraTimeline->AddInterpFloat(RollStepBackCameraCurve, RollStepBackCameraTimeLineInterpFunction);
+	RollStepBackCameraTimeline->SetTimelineLength(0.4f);
+	RollStepBackCameraTimeline->SetLooping(false);
 
 }
 
@@ -325,4 +340,31 @@ UTimelineComponent* AUnseenCharacterPlayer::GetRollTimeline()
 UTimelineComponent* AUnseenCharacterPlayer::GetStepBackTimeline()
 {
 	return StepBackTimeline;
+}
+
+void AUnseenCharacterPlayer::RollStepBackCameraLerp()
+{
+	if (bIsRollStepBackActive)
+	{
+		RollStepBackCameraTimeline->PlayFromStart();
+	}
+
+	else
+	{
+		RollStepBackCameraTimeline->ReverseFromEnd();
+	}
+}
+
+void AUnseenCharacterPlayer::OnRollStepBackCameraTimelineUpdated(float Value)
+{
+	float CurrentTargetArmLength = GetSpringArmComponent()->TargetArmLength;
+
+	if (bIsRollStepBackActive)
+	{
+		GetSpringArmComponent()->TargetArmLength = FMath::Max(CurrentTargetArmLength, Value);
+	}
+	else
+	{
+		GetSpringArmComponent()->TargetArmLength = FMath::Min(CurrentTargetArmLength, Value);
+	}
 }

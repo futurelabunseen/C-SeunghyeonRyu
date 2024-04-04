@@ -27,7 +27,8 @@ void UGA_Roll::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	UnseenCharacter->SetActorRotation(FRotationMatrix::MakeFromX(UnseenCharacter->GetCharacterMovement()->GetLastInputVector()).Rotator());
 
 	///UnseenCharacter->bUseControllerRotationYaw = false;
-
+	UnseenCharacter->bIsRollStepBackActive = true;
+	UnseenCharacter->RollStepBackCameraLerp();
 	UAbilityTask_PlayMontageAndWait* PlayRollTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayRoll"), UnseenCharacter->GetRollMontage());
 
 	UnseenCharacter->GetRollTimeline()->PlayFromStart();
@@ -64,6 +65,8 @@ void UGA_Roll::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGamepl
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+	UnseenCharacter->bIsRollStepBackActive = false;
+	UnseenCharacter->RollStepBackCameraLerp();
 	UnseenCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 
 }

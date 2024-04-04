@@ -139,8 +139,20 @@ public:
 	UTimelineComponent* GetStepBackTimeline();
 
 public:
-	// Todo #1 : 카메라 줌인 줌아웃 함수 lerp 써서 만들고 Roll이랑 step_back에 넣기
-	
+	// Todo #1 : 카메라 줌인 줌아웃 함수 lerp 써서 만들고 Roll이랑 step_back, aim 만들기
+	UFUNCTION()
+	void RollStepBackCameraLerp();
 
+	UFUNCTION()
+	void OnRollStepBackCameraTimelineUpdated(float Value);
 
+	UPROPERTY()
+	UCurveFloat* RollStepBackCameraCurve;
+
+	UPROPERTY()
+	UTimelineComponent* RollStepBackCameraTimeline;
+	FOnTimelineFloat RollStepBackCameraTimeLineInterpFunction{};
+
+	UPROPERTY()
+	bool bIsRollStepBackActive = true;
 };
