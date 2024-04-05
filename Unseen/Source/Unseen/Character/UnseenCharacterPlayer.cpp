@@ -29,6 +29,8 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	// Get Ability System from PlayerState
 	ASC = nullptr;
 
+	bIsRollStepBackActive = true;
+
 	// Input
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/ThirdPerson/Input/IMC_Default.IMC_Default'"));
 	if (nullptr != InputMappingContextRef.Object)

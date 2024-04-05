@@ -2,8 +2,9 @@
 
 
 #include "Animation/UnseenAnimInstance.h"
-#include "GameFramework/Character.h"
+//#include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+
 
 UUnseenAnimInstance::UUnseenAnimInstance()
 {
@@ -15,7 +16,7 @@ void UUnseenAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	Owner = Cast<ACharacter>(GetOwningActor());
+	Owner = Cast<AUnseenCharacterPlayer>(GetOwningActor());
 	if (Owner)
 	{
 		Movement = Owner->GetCharacterMovement();
@@ -25,7 +26,7 @@ void UUnseenAnimInstance::NativeInitializeAnimation()
 void UUnseenAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-
+	//AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 	if (Movement)
 	{
 		Velocity = Movement->Velocity;
@@ -36,5 +37,6 @@ void UUnseenAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshold);
 		//UE_LOG(LogTemp, Warning, TEXT("bIsJumping : %u"), bIsJumping);
 		Direction = CalculateDirection(Velocity, Owner->GetActorRotation());
+		bIsAiming = Owner->bIsAiming;
 	}
 }

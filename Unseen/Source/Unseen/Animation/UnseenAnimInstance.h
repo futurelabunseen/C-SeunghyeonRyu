@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Character/UnseenCharacterPlayer.h"
 #include "UnseenAnimInstance.generated.h"
 
 /**
@@ -23,7 +24,7 @@ protected:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
-	TObjectPtr<class ACharacter> Owner;
+	TObjectPtr<class AUnseenCharacterPlayer> Owner;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
 	TObjectPtr<class UCharacterMovementComponent> Movement;
@@ -50,6 +51,8 @@ protected:
 	float JumpingThreshold;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-
 	float Direction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
+	uint8 bIsAiming : 1;
 };

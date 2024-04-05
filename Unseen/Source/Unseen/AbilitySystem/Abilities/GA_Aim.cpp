@@ -2,6 +2,8 @@
 
 
 #include "AbilitySystem/Abilities/GA_Aim.h"
+#include "Character/UnseenCharacterPlayer.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UGA_Aim::UGA_Aim()
 {
@@ -19,6 +21,10 @@ void UGA_Aim::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGa
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+	UnseenCharacter->bIsAiming = true;
+	UnseenCharacter->GetCharacterMovement()->MaxWalkSpeed = 180.f;
+
 	// ¡‹ ¿Œ «ÿæﬂ«‘.
 	UE_LOG(LogTemp, Warning, TEXT("aim in"));
 
@@ -27,8 +33,12 @@ void UGA_Aim::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGa
 void UGA_Aim::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
 	// ¡‹ æ∆øÙ
-	UE_LOG(LogTemp, Warning, TEXT("aim out"));
+	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+	UnseenCharacter->bIsAiming = false;;
+	UnseenCharacter->GetCharacterMovement()->MaxWalkSpeed = 300.f;
 
+	UE_LOG(LogTemp, Warning, TEXT("aim out"));
+	
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 

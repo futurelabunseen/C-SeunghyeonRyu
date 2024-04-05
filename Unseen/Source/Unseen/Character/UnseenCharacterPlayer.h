@@ -157,7 +157,10 @@ public:
 	FOnTimelineFloat RollStepBackCameraTimeLineInterpFunction{};
 
 	UPROPERTY()
-	bool bIsRollStepBackActive = true;
+	uint8 bIsRollStepBackActive : 1;
+
+	UPROPERTY()
+	uint8 bIsAiming : 1;
 
 	
 protected:
