@@ -33,7 +33,7 @@ void UGA_Roll::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	UnseenCharacter->RollStepBackCameraLerp();
 	UAbilityTask_PlayMontageAndWait* PlayRollTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayRoll"), UnseenCharacter->GetRollMontage());
 
-	UnseenCharacter->GetRollTimeline()->PlayFromStart();
+	UnseenCharacter->GetRollMovementTimeline()->PlayFromStart();
 
 	PlayRollTask->OnCompleted.AddDynamic(this, &UGA_Roll::OnCompleteCallback);
 	PlayRollTask->OnInterrupted.AddDynamic(this, &UGA_Roll::OnInterruptedCallback);

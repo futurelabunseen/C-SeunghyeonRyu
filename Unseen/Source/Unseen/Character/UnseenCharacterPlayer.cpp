@@ -92,16 +92,16 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 		StepBackMontage = StepBackMontageRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UCurveFloat> RollCurveRef(TEXT("/Script/Engine.CurveFloat'/Game/Animation/FloatCurve_Roll.FloatCurve_Roll'"));
-	if (RollCurveRef.Object)
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> RollMovementCurveRef(TEXT("/Script/Engine.CurveFloat'/Game/Animation/FloatCurve_Roll.FloatCurve_Roll'"));
+	if (RollMovementCurveRef.Object)
 	{
-		RollCurve = RollCurveRef.Object;
+		RollMovementCurve = RollMovementCurveRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UCurveFloat> StepBackCurveRef(TEXT("/Script/Engine.CurveFloat'/Game/Animation/FloatCurve_StepBack.FloatCurve_StepBack'"));
-	if (StepBackCurveRef.Object)
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> StepBackMovementCurveRef(TEXT("/Script/Engine.CurveFloat'/Game/Animation/FloatCurve_StepBack.FloatCurve_StepBack'"));
+	if (StepBackMovementCurveRef.Object)
 	{
-		StepBackCurve = StepBackCurveRef.Object;
+		StepBackMovementCurve = StepBackMovementCurveRef.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> RollStepBackCameraCurveRef(TEXT("/Script/Engine.CurveFloat'/Game/Curve/FloatCurve_RollStepBackCamera.FloatCurve_RollStepBackCamera'"));
@@ -110,13 +110,21 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 		RollStepBackCameraCurve = RollStepBackCameraCurveRef.Object;
 	}
 
-	RollTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RollTimeline"));
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> AimCameraCurveRef(TEXT("/Script/Engine.CurveFloat'/Game/Curve/FloatCurve_AimCamera.FloatCurve_AimCamera'"));
+	if (AimCameraCurveRef.Object)
+	{
+		AimCameraCurve = AimCameraCurveRef.Object;
+	}
+
+	RollMovementTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RollMovementTimeline"));
 	RollDistance = 400.f;
 
-	StepBackTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("StepBackTimeline"));
+	StepBackMovementTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("StepBackMovementTimeline"));
 	StepBackDistance = -400.f;
 
 	RollStepBackCameraTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RollStepBackCameraTimeline"));
+
+	AimCameraTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("AimCameraTimeline"));
 
 }
 
@@ -159,23 +167,29 @@ void AUnseenCharacterPlayer::BeginPlay()
 		//Subsystem->RemoveMappingContext(DefaultMappingContext);
 	}
 
-	// Roll Timeline
-	RollTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnRollTimelineUpdated") });
-	RollTimeline->AddInterpFloat(RollCurve, RollTimeLineInterpFunction);
-	RollTimeline->SetTimelineLength(RollMontage->GetPlayLength());
-	RollTimeline->SetLooping(false);
+	// Roll Movement Timeline
+	RollTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnRollMovementTimelineUpdated") });
+	RollMovementTimeline->AddInterpFloat(RollMovementCurve, RollTimeLineInterpFunction);
+	RollMovementTimeline->SetTimelineLength(RollMontage->GetPlayLength());
+	RollMovementTimeline->SetLooping(false);
 	
-	// StepBack Timeline
-	StepBackTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnStepBackTimelineUpdated") });
-	StepBackTimeline->AddInterpFloat(StepBackCurve, StepBackTimeLineInterpFunction);
-	StepBackTimeline->SetTimelineLength(StepBackMontage->GetPlayLength());
-	StepBackTimeline->SetLooping(false);
+	// StepBack Movement Timeline
+	StepBackTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnStepBackMovementTimelineUpdated") });
+	StepBackMovementTimeline->AddInterpFloat(StepBackMovementCurve, StepBackTimeLineInterpFunction);
+	StepBackMovementTimeline->SetTimelineLength(StepBackMontage->GetPlayLength());
+	StepBackMovementTimeline->SetLooping(false);
 
-	// StepBack Timeline
+	// Roll StepBack Camera Timeline
 	RollStepBackCameraTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnRollStepBackCameraTimelineUpdated") });
 	RollStepBackCameraTimeline->AddInterpFloat(RollStepBackCameraCurve, RollStepBackCameraTimeLineInterpFunction);
 	RollStepBackCameraTimeline->SetTimelineLength(0.4f);
 	RollStepBackCameraTimeline->SetLooping(false);
+
+	// Aim Camera Timeline
+	AimCameraTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnAimCameraTimelineUpdated") });
+	AimCameraTimeline->AddInterpFloat(AimCameraCurve, AimCameraTimeLineInterpFunction);
+	AimCameraTimeline->SetTimelineLength(0.3f);
+	AimCameraTimeline->SetLooping(false);
 
 }
 
@@ -299,6 +313,7 @@ void AUnseenCharacterPlayer::SetupGASInputComponent()
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 4);
 
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 5);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 5);
 		
 	}
 }
@@ -335,28 +350,29 @@ void AUnseenCharacterPlayer::GASInputReleased(int32 InputId)
 	}
 }
 
-void AUnseenCharacterPlayer::OnRollTimelineUpdated(float Value)
+void AUnseenCharacterPlayer::OnRollMovementTimelineUpdated(float Value)
 {
 	GetCharacterMovement()->Velocity = Value * RollDistance * GetActorForwardVector();
 }
 
-void AUnseenCharacterPlayer::OnStepBackTimelineUpdated(float Value)
+void AUnseenCharacterPlayer::OnStepBackMovementTimelineUpdated(float Value)
 {
 	GetCharacterMovement()->Velocity = Value * StepBackDistance * GetActorForwardVector();
 }
 
-UTimelineComponent* AUnseenCharacterPlayer::GetRollTimeline()
+UTimelineComponent* AUnseenCharacterPlayer::GetRollMovementTimeline()
 {
-	return RollTimeline;
+	return RollMovementTimeline;
 }
 
-UTimelineComponent* AUnseenCharacterPlayer::GetStepBackTimeline()
+UTimelineComponent* AUnseenCharacterPlayer::GetStepBackMovementTimeline()
 {
-	return StepBackTimeline;
+	return StepBackMovementTimeline;
 }
 
 void AUnseenCharacterPlayer::RollStepBackCameraLerp()
 {
+	UpdateCurrentTargetArmLength();
 	if (bIsRollStepBackActive)
 	{
 		RollStepBackCameraTimeline->PlayFromStart();
@@ -368,21 +384,74 @@ void AUnseenCharacterPlayer::RollStepBackCameraLerp()
 	}
 }
 
+void AUnseenCharacterPlayer::AimCameraLerp()
+{
+	UpdateCurrentTargetArmLength();
+	UpdateCurrentSpringArmSocketOffset();
+
+	// To prevent overwriting
+	if (RollStepBackCameraTimeline->IsPlaying())
+	{
+		RollStepBackCameraTimeline->Stop();
+	}
+
+	AimCameraTimeline->PlayFromStart();
+}
+
 void AUnseenCharacterPlayer::OnRollStepBackCameraTimelineUpdated(float Value)
 {
-	float CurrentTargetArmLength = GetSpringArmComponent()->TargetArmLength;
+	//float CurrentTargetArmLength = GetSpringArmComponent()->TargetArmLength;
+
+	if (AimCameraTimeline->IsPlaying())
+	{
+		AimCameraTimeline->Stop();
+	}
 
 	if (bIsRollStepBackActive)
+	{
+		GetSpringArmComponent()->TargetArmLength = FMath::Lerp(CurrentTargetArmLength, 300, Value);
+	}
+	else
+	{
+		GetSpringArmComponent()->TargetArmLength = FMath::Lerp(200, CurrentTargetArmLength, Value);
+	}
+
+	/*if (bIsRollStepBackActive)
 	{
 		GetSpringArmComponent()->TargetArmLength = FMath::Max(CurrentTargetArmLength, Value);
 	}
 	else
 	{
 		GetSpringArmComponent()->TargetArmLength = FMath::Min(CurrentTargetArmLength, Value);
+	}*/
+}
+
+void AUnseenCharacterPlayer::OnAimCameraTimelineUpdated(float Value)
+{
+	// 나중에 값들 변수로 빼자
+	if (bIsAiming)
+	{
+		GetSpringArmComponent()->TargetArmLength = FMath::Lerp(CurrentTargetArmLength, 60, Value);
+		GetSpringArmComponent()->SocketOffset = FVector(0, FMath::Lerp(CurrentSpringArmSocketOffset.Y, 72, Value), FMath::Lerp(CurrentSpringArmSocketOffset.Z, 56, Value));
+	}
+	else
+	{
+		GetSpringArmComponent()->TargetArmLength = FMath::Lerp(CurrentTargetArmLength, 200, Value);
+		GetSpringArmComponent()->SocketOffset = FVector(0, FMath::Lerp(CurrentSpringArmSocketOffset.Y, 70, Value), FMath::Lerp(CurrentSpringArmSocketOffset.Z, 50, Value));
 	}
 }
 
 FVector2D AUnseenCharacterPlayer::GetLastInputMovementVector()
 {
 	return LastInputMovementVector;
+}
+
+void AUnseenCharacterPlayer::UpdateCurrentTargetArmLength()
+{
+	CurrentTargetArmLength = GetSpringArmComponent()->TargetArmLength;
+}
+
+void AUnseenCharacterPlayer::UpdateCurrentSpringArmSocketOffset()
+{
+	CurrentSpringArmSocketOffset = GetSpringArmComponent()->SocketOffset;
 }

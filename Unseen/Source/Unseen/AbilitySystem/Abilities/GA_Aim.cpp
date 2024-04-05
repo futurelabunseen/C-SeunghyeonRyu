@@ -23,26 +23,28 @@ void UGA_Aim::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGa
 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 	UnseenCharacter->bIsAiming = true;
+	UnseenCharacter->bUseControllerRotationYaw = true;
 	UnseenCharacter->GetCharacterMovement()->MaxWalkSpeed = 180.f;
 
-	// ÁÜ ÀÎ ÇØ¾ßÇÔ.
+	UnseenCharacter->AimCameraLerp();
 	UE_LOG(LogTemp, Warning, TEXT("aim in"));
 
 }
 
 void UGA_Aim::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
-	// ÁÜ ¾Æ¿ô
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 	UnseenCharacter->bIsAiming = false;;
+	UnseenCharacter->bUseControllerRotationYaw = false;
 	UnseenCharacter->GetCharacterMovement()->MaxWalkSpeed = 300.f;
 
+	UnseenCharacter->AimCameraLerp();
 	UE_LOG(LogTemp, Warning, TEXT("aim out"));
 	
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 
-void UGA_Aim::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
+void UGA_Aim::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	if (ActorInfo != NULL && ActorInfo->AvatarActor != NULL)
 	{

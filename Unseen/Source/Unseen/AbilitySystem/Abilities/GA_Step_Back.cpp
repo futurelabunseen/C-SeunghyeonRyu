@@ -34,7 +34,7 @@ void UGA_Step_Back::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	UnseenCharacter->bIsRollStepBackActive = true;
 	UnseenCharacter->RollStepBackCameraLerp();
 
-	UnseenCharacter->GetStepBackTimeline()->PlayFromStart();
+	UnseenCharacter->GetStepBackMovementTimeline()->PlayFromStart();
 
 	PlayStepBackTask->OnCompleted.AddDynamic(this, &UGA_Step_Back::OnCompleteCallback);
 	PlayStepBackTask->OnInterrupted.AddDynamic(this, &UGA_Step_Back::OnInterruptedCallback);

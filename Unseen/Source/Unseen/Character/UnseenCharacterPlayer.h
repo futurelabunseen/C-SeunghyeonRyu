@@ -105,13 +105,13 @@ protected:
 	
 // Roll
 	UPROPERTY()
-	UTimelineComponent* RollTimeline;
+	UTimelineComponent* RollMovementTimeline;
 
 	UPROPERTY()
-	UCurveFloat* RollCurve;
+	UCurveFloat* RollMovementCurve;
 
 	UFUNCTION()
-	void OnRollTimelineUpdated(float Value);
+	void OnRollMovementTimelineUpdated(float Value);
 
 	FOnTimelineFloat RollTimeLineInterpFunction{};
 
@@ -120,13 +120,13 @@ protected:
 
 // StepBack
 	UPROPERTY()
-	UTimelineComponent* StepBackTimeline;
+	UTimelineComponent* StepBackMovementTimeline;
 
 	UPROPERTY()
-	UCurveFloat* StepBackCurve;
+	UCurveFloat* StepBackMovementCurve;
 
 	UFUNCTION()
-	void OnStepBackTimelineUpdated(float Value);
+	void OnStepBackMovementTimelineUpdated(float Value);
 
 	FOnTimelineFloat StepBackTimeLineInterpFunction{};
 
@@ -136,39 +136,60 @@ protected:
 
 public:
 	UFUNCTION()
-	UTimelineComponent* GetRollTimeline();
+	UTimelineComponent* GetRollMovementTimeline();
 
 	UFUNCTION()
-	UTimelineComponent* GetStepBackTimeline();
+	UTimelineComponent* GetStepBackMovementTimeline();
 
-public:
+protected:
 	// Todo #1 : Ä«¸Þ¶ó ÁÜÀÎ ÁÜ¾Æ¿ô ÇÔ¼ö lerp ½á¼­ ¸¸µé°í RollÀÌ¶û step_back, aim ¸¸µé±â
 	UFUNCTION()
-	void RollStepBackCameraLerp();
+	void OnRollStepBackCameraTimelineUpdated(float Value);
 
 	UFUNCTION()
-	void OnRollStepBackCameraTimelineUpdated(float Value);
+	void OnAimCameraTimelineUpdated(float Value);
 
 	UPROPERTY()
 	UCurveFloat* RollStepBackCameraCurve;
 
 	UPROPERTY()
+	UCurveFloat* AimCameraCurve;
+
+	UPROPERTY()
 	UTimelineComponent* RollStepBackCameraTimeline;
+
+	UPROPERTY()
+	UTimelineComponent* AimCameraTimeline;
+
 	FOnTimelineFloat RollStepBackCameraTimeLineInterpFunction{};
+	FOnTimelineFloat AimCameraTimeLineInterpFunction{};
+
+	UPROPERTY()
+	FVector2D LastInputMovementVector;
+
+	UPROPERTY()
+	float CurrentTargetArmLength;
+	UPROPERTY()
+	FVector CurrentSpringArmSocketOffset;
+
+public:
+	UFUNCTION()
+	void RollStepBackCameraLerp();
+
+	UFUNCTION()
+	void AimCameraLerp();
+
+	UFUNCTION()
+	FVector2D GetLastInputMovementVector();
+
+	UFUNCTION()
+	void UpdateCurrentTargetArmLength();
+	UFUNCTION()
+	void UpdateCurrentSpringArmSocketOffset();
 
 	UPROPERTY()
 	uint8 bIsRollStepBackActive : 1;
 
 	UPROPERTY()
 	uint8 bIsAiming : 1;
-
-	
-protected:
-	UPROPERTY()
-	FVector2D LastInputMovementVector;
-
-public:
-	UFUNCTION()
-	FVector2D GetLastInputMovementVector();
-
 };

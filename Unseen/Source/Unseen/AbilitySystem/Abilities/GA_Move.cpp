@@ -46,7 +46,11 @@ void UGA_Move::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGam
 	}
 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
-	UnseenCharacter->bUseControllerRotationYaw = false;
+	
+	if (!UnseenCharacter->bIsAiming)
+	{
+		UnseenCharacter->bUseControllerRotationYaw = false;
+	}
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 
