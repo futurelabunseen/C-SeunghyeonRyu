@@ -59,13 +59,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* StepBackAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* AimAction;
+
 	void Move(const FInputActionValue& Value);
-	void StopMoving();
+	//void StopMoving();
 
 	void Look(const FInputActionValue& Value);
 
-	void Sprint();
-	void StopSprinting();
+	//void Sprint();
+	//void StopSprinting();
 
 // Ability System
 public:
@@ -155,4 +158,14 @@ public:
 
 	UPROPERTY()
 	bool bIsRollStepBackActive = true;
+
+	
+protected:
+	UPROPERTY()
+	FVector2D LastInputMovementVector;
+
+public:
+	UFUNCTION()
+	FVector2D GetLastInputMovementVector();
+
 };

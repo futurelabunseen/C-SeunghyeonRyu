@@ -72,6 +72,12 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 		StepBackAction = InputActionStepBackRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionAimRef(TEXT("/Script/EnhancedInput.InputAction'/Game/ThirdPerson/Input/Actions/IA_Aim.IA_Aim'"));
+	if (nullptr != InputActionAimRef.Object)
+	{
+		AimAction = InputActionAimRef.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> RollMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/AM_Roll_Rifle.AM_Roll_Rifle'"));
 	if (RollMontageRef.Succeeded())
 	{
@@ -182,7 +188,7 @@ void AUnseenCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Pl
 
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::Move);
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::StopMoving);
+		//EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::StopMoving);
 
 		//Sprinting
 		//EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::Sprint);
@@ -195,36 +201,39 @@ void AUnseenCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Pl
 
 void AUnseenCharacterPlayer::Move(const FInputActionValue& Value)
 {
-	FGameplayTagContainer CurrentOwnedGameplayTags;
-	ASC->GetOwnedGameplayTags(CurrentOwnedGameplayTags);
-	if (CurrentOwnedGameplayTags.HasTag(FGameplayTag::RequestGameplayTag("Character.State.IsMoving")))
-	{
-		// input is a Vector2D
-		FVector2D MovementVector = Value.Get<FVector2D>();
+	LastInputMovementVector = Value.Get<FVector2D>();
+	
 
-		if (Controller != nullptr)
-		{
-			// find out which way is forward
-			const FRotator Rotation = Controller->GetControlRotation();
-			const FRotator YawRotation(0, Rotation.Yaw, 0);
+	//FGameplayTagContainer CurrentOwnedGameplayTags;
+	//ASC->GetOwnedGameplayTags(CurrentOwnedGameplayTags);
+	//if (CurrentOwnedGameplayTags.HasTag(FGameplayTag::RequestGameplayTag("Character.State.IsMoving")))
+	//{
+	//	// input is a Vector2D
+	//	FVector2D MovementVector = Value.Get<FVector2D>();
 
-			// get forward vector
-			const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	//	if (Controller != nullptr)
+	//	{
+	//		// find out which way is forward
+	//		const FRotator Rotation = Controller->GetControlRotation();
+	//		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-			// get right vector 
-			const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	//		// get forward vector
+	//		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-			// add movement 
-			AddMovementInput(ForwardDirection, MovementVector.X);
-			AddMovementInput(RightDirection, MovementVector.Y);
-		}
-	}
+	//		// get right vector 
+	//		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+	//		// add movement 
+	//		AddMovementInput(ForwardDirection, MovementVector.X);
+	//		AddMovementInput(RightDirection, MovementVector.Y);
+	//	}
+	//}
 }
 
-void AUnseenCharacterPlayer::StopMoving()
-{
-	///bUseControllerRotationYaw = false;
-}
+//void AUnseenCharacterPlayer::StopMoving()
+//{
+//	///bUseControllerRotationYaw = false;
+//}
 
 void AUnseenCharacterPlayer::Look(const FInputActionValue& Value)
 {
@@ -239,22 +248,22 @@ void AUnseenCharacterPlayer::Look(const FInputActionValue& Value)
 	}
 }
 
-void AUnseenCharacterPlayer::Sprint()
-{
-	FVector CharacterForward = GetActorForwardVector();
-	FVector VelocityDirection = GetVelocity().GetSafeNormal();
-	float MovementDirection = FVector::DotProduct(CharacterForward, VelocityDirection);
-
-	if (!GetCharacterMovement()->Velocity.IsNearlyZero() && MovementDirection > 0.5)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = 500.f;
-	}
-}
-
-void AUnseenCharacterPlayer::StopSprinting()
-{
-	GetCharacterMovement()->MaxWalkSpeed = 300.f;
-}
+//void AUnseenCharacterPlayer::Sprint()
+//{
+//	FVector CharacterForward = GetActorForwardVector();
+//	FVector VelocityDirection = GetVelocity().GetSafeNormal();
+//	float MovementDirection = FVector::DotProduct(CharacterForward, VelocityDirection);
+//
+//	if (!GetCharacterMovement()->Velocity.IsNearlyZero() && MovementDirection > 0.5)
+//	{
+//		GetCharacterMovement()->MaxWalkSpeed = 500.f;
+//	}
+//}
+//
+//void AUnseenCharacterPlayer::StopSprinting()
+//{
+//	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+//}
 
 
 //Ability System
@@ -286,6 +295,8 @@ void AUnseenCharacterPlayer::SetupGASInputComponent()
 
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 4);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 4);
+
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 5);
 		
 	}
 }
@@ -367,4 +378,9 @@ void AUnseenCharacterPlayer::OnRollStepBackCameraTimelineUpdated(float Value)
 	{
 		GetSpringArmComponent()->TargetArmLength = FMath::Min(CurrentTargetArmLength, Value);
 	}
+}
+
+FVector2D AUnseenCharacterPlayer::GetLastInputMovementVector()
+{
+	return LastInputMovementVector;
 }

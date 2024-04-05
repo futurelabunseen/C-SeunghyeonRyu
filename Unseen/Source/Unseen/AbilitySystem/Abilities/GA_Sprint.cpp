@@ -9,11 +9,12 @@ UGA_Sprint::UGA_Sprint()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 
-	ActivationRequiredTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsMoving"));
-
-	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsRolling"));
-
+	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag("Character.Action.Sprint"));
 	ActivationOwnedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsSprinting"));
+
+	ActivationRequiredTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsMoving"));
+	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsRolling"));
+	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsAiming"));
 }
 
 void UGA_Sprint::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -23,6 +24,7 @@ void UGA_Sprint::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 
 	UnseenCharacter->GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	// 여기에도 스테미나 소모 넣어야 함. 아니면 이걸 다 pressed로 넘길까
 }
 
 bool UGA_Sprint::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
@@ -49,14 +51,14 @@ bool UGA_Sprint::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 void UGA_Sprint::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
+
+	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+	UnseenCharacter->GetCharacterMovement()->MaxWalkSpeed = 300.f;
 }
 
 void UGA_Sprint::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-
-	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
-	UnseenCharacter->GetCharacterMovement()->MaxWalkSpeed = 300.f;
 }
 
 void UGA_Sprint::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
@@ -70,6 +72,7 @@ void UGA_Sprint::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGa
 	if (!UnseenCharacter->GetCharacterMovement()->Velocity.IsNearlyZero() && MovementDirection > -0.1)
 	{
 		Super::InputPressed(Handle, ActorInfo, ActivationInfo);
+		// 여기에 스테미나 소모 넣으면 됨
 	}
 	else
 	{
