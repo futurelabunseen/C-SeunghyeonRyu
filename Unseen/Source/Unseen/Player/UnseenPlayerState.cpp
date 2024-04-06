@@ -9,6 +9,7 @@ AUnseenPlayerState::AUnseenPlayerState()
 {
 	// Ability System
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
+	AttributeSet = CreateDefaultSubobject<UUnseenCharacterAttributeSet>(TEXT("AttributeSet"));
 }
 
 

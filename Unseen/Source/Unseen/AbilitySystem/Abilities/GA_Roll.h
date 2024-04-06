@@ -29,4 +29,7 @@ protected:
 	UFUNCTION()
 	void OnInterruptedCallback();
 
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TSubclassOf<class UGameplayEffect> RollStaminaEffect;
+
 };

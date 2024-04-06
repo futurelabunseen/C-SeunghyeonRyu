@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
 #include "AbilitySystemInterface.h"
+#include "AbilitySystem/Attribute/UnseenCharacterAttributeSet.h"
 #include "UnseenPlayerState.generated.h"
 
 /**
@@ -25,4 +26,7 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TObjectPtr<class UAbilitySystemComponent> ASC;
+
+	UPROPERTY()
+	TObjectPtr<class UUnseenCharacterAttributeSet> AttributeSet;
 };

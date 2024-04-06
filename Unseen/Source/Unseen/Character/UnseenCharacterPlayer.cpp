@@ -153,6 +153,9 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 
 		SetupGASInputComponent();
 	}
+	
+	APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
+	PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 }
 
 void AUnseenCharacterPlayer::BeginPlay()
