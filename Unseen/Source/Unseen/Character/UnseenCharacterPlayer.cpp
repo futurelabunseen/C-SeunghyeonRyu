@@ -120,7 +120,7 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	RollDistance = 400.f;
 
 	StepBackMovementTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("StepBackMovementTimeline"));
-	StepBackDistance = -400.f;
+	StepBackDistance = -650.f; // not real distance.
 
 	RollStepBackCameraTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RollStepBackCameraTimeline"));
 
@@ -431,13 +431,15 @@ void AUnseenCharacterPlayer::OnAimCameraTimelineUpdated(float Value)
 	// 나중에 값들 변수로 빼자
 	if (bIsAiming)
 	{
-		GetSpringArmComponent()->TargetArmLength = FMath::Lerp(CurrentTargetArmLength, 60, Value);
-		GetSpringArmComponent()->SocketOffset = FVector(0, FMath::Lerp(CurrentSpringArmSocketOffset.Y, 72, Value), FMath::Lerp(CurrentSpringArmSocketOffset.Z, 56, Value));
+		GetSpringArmComponent()->TargetArmLength = FMath::Lerp(CurrentTargetArmLength, 62, Value);
+		GetSpringArmComponent()->SocketOffset = FVector(0, 68, FMath::Lerp(CurrentSpringArmSocketOffset.Z, 56, Value));
+		//GetSpringArmComponent()->SocketOffset = FVector(0, FMath::Lerp(CurrentSpringArmSocketOffset.Y, 71, Value), FMath::Lerp(CurrentSpringArmSocketOffset.Z, 56, Value));
 	}
 	else
 	{
 		GetSpringArmComponent()->TargetArmLength = FMath::Lerp(CurrentTargetArmLength, 200, Value);
-		GetSpringArmComponent()->SocketOffset = FVector(0, FMath::Lerp(CurrentSpringArmSocketOffset.Y, 70, Value), FMath::Lerp(CurrentSpringArmSocketOffset.Z, 50, Value));
+		GetSpringArmComponent()->SocketOffset = FVector(0, 70, FMath::Lerp(CurrentSpringArmSocketOffset.Z, 50, Value));
+		//GetSpringArmComponent()->SocketOffset = FVector(0, FMath::Lerp(CurrentSpringArmSocketOffset.Y, 70, Value), FMath::Lerp(CurrentSpringArmSocketOffset.Z, 50, Value));
 	}
 }
 
