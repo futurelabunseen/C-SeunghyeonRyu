@@ -10,6 +10,7 @@
 #include "AbilitySystemComponent.h"
 #include "Player/UnseenPlayerState.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/SpringArmComponent.h"
 
 AUnseenCharacterPlayer::AUnseenCharacterPlayer()
@@ -30,6 +31,8 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	ASC = nullptr;
 
 	bIsRollStepBackActive = true;
+	bIsBlockedRegenStamina = false;
+	bIsSprinting = false;
 
 	// Input
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/ThirdPerson/Input/IMC_Default.IMC_Default'"));
@@ -156,6 +159,10 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 	
 	APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
 	PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
+
+	const UGameplayEffect* RegenStaminaEffectCDO = RegenStaminaEffect->GetDefaultObject<UGameplayEffect>();
+	ASC->ApplyGameplayEffectToSelf(RegenStaminaEffectCDO, 0, ASC->MakeEffectContext());
+
 }
 
 void AUnseenCharacterPlayer::BeginPlay()
@@ -459,4 +466,33 @@ void AUnseenCharacterPlayer::UpdateCurrentTargetArmLength()
 void AUnseenCharacterPlayer::UpdateCurrentSpringArmSocketOffset()
 {
 	CurrentSpringArmSocketOffset = GetSpringArmComponent()->SocketOffset;
+}
+
+void AUnseenCharacterPlayer::StopRegenStamina()
+{
+	if (!bIsBlockedRegenStamina)
+	{
+		bIsBlockedRegenStamina = true;
+		ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag("Character.State.BlockedRegenStamina"));
+	}
+}
+
+void AUnseenCharacterPlayer::StartRegenStaminaWithDelay(float DelayTime)
+{
+	FLatentActionInfo LatentActionInfo;
+	LatentActionInfo.CallbackTarget = this;
+	LatentActionInfo.ExecutionFunction = "StartRegenStamina";
+	LatentActionInfo.UUID = GetUniqueID();
+	LatentActionInfo.Linkage = 0;
+	
+	UKismetSystemLibrary::RetriggerableDelay(GetWorld(), DelayTime, LatentActionInfo);
+}
+
+void AUnseenCharacterPlayer::StartRegenStamina()
+{
+	if (bIsBlockedRegenStamina && !bIsSprinting)
+	{
+		ASC->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag("Character.State.BlockedRegenStamina"));
+		bIsBlockedRegenStamina = false;
+	}
 }

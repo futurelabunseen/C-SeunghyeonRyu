@@ -4,6 +4,7 @@
 #include "AbilitySystem/Abilities/GA_Sprint.h"
 #include "Character/UnseenCharacterPlayer.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "AbilitySystem/Attribute/UnseenCharacterAttributeSet.h"
 
 UGA_Sprint::UGA_Sprint()
 {
@@ -22,9 +23,17 @@ void UGA_Sprint::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+	UnseenCharacter->bIsSprinting = true;
+	UnseenCharacter->StopRegenStamina();
+	
+	// Use Stamina
+	FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(UseStaminaEffect);
+	if (EffectSpecHandle.IsValid())
+	{
+		ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle);
+	}
 
 	UnseenCharacter->GetCharacterMovement()->MaxWalkSpeed = 500.f;
-	// 여기에도 스테미나 소모 넣어야 함. 아니면 이걸 다 pressed로 넘길까
 }
 
 bool UGA_Sprint::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
@@ -40,7 +49,11 @@ bool UGA_Sprint::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	FVector VelocityDirection = UnseenCharacter->GetVelocity().GetSafeNormal();
 	float MovementDirection = FVector::DotProduct(CharacterForward, VelocityDirection);
 
-	if (MovementDirection > -0.1)
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo_Checked();
+	const UUnseenCharacterAttributeSet* AttributeSet = ASC->GetSet<UUnseenCharacterAttributeSet>();
+
+	// minimum stamina >= 5
+	if (AttributeSet->GetStamina() >= 5 && MovementDirection > -0.1)
 	{
 		return true;
 	}
@@ -53,6 +66,10 @@ void UGA_Sprint::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+
+	UnseenCharacter->StartRegenStaminaWithDelay(2.0f);
+	UnseenCharacter->bIsSprinting = false;
+
 	UnseenCharacter->GetCharacterMovement()->MaxWalkSpeed = 300.f;
 }
 
@@ -69,10 +86,14 @@ void UGA_Sprint::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGa
 	FVector VelocityDirection = UnseenCharacter->GetVelocity().GetSafeNormal();
 	float MovementDirection = FVector::DotProduct(CharacterForward, VelocityDirection);
 
-	if (!UnseenCharacter->GetCharacterMovement()->Velocity.IsNearlyZero() && MovementDirection > -0.1)
+	// 스테미나 검사
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo_Checked();
+	const UUnseenCharacterAttributeSet* AttributeSet = ASC->GetSet<UUnseenCharacterAttributeSet>();
+	bool bIsEnoughStamina = !(AttributeSet->GetStamina() < -AttributeSet->GetSprintStaminaCost());
+
+	if (bIsEnoughStamina && !UnseenCharacter->GetCharacterMovement()->Velocity.IsNearlyZero() && MovementDirection > -0.1)
 	{
 		Super::InputPressed(Handle, ActorInfo, ActivationInfo);
-		// 여기에 스테미나 소모 넣으면 됨
 	}
 	else
 	{

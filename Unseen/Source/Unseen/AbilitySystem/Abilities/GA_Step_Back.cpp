@@ -5,6 +5,7 @@
 #include "Character/UnseenCharacterPlayer.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "AbilitySystem/Attribute/UnseenCharacterAttributeSet.h"
 
 UGA_Step_Back::UGA_Step_Back()
 {
@@ -23,6 +24,17 @@ void UGA_Step_Back::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+
+	UnseenCharacter->StopRegenStamina();
+	UnseenCharacter->StartRegenStaminaWithDelay(4.07f);
+
+	// Use Stamina
+	FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(UseStaminaEffect);
+	if (EffectSpecHandle.IsValid())
+	{
+		ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle);
+	}
+
 	
 	FRotator ControllerRotator(0.f, UnseenCharacter->GetControlRotation().Yaw, 0.f);
 	UnseenCharacter->SetActorRotation(ControllerRotator);
@@ -45,6 +57,14 @@ void UGA_Step_Back::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 bool UGA_Step_Back::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
 {
 	if (!Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
+	{
+		return false;
+	}
+
+	// 스테미나 검사
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo_Checked();
+	const UUnseenCharacterAttributeSet* AttributeSet = ASC->GetSet<UUnseenCharacterAttributeSet>();
+	if (AttributeSet->GetStamina() < -AttributeSet->GetStepBackStaminaCost())
 	{
 		return false;
 	}

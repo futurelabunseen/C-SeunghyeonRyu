@@ -93,6 +93,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TMap<int32, TSubclassOf<class UGameplayAbility>> StartInputAbilities;
 
+	UPROPERTY(EditAnywhere, Category = GAS)
+	TSubclassOf<class UGameplayEffect> RegenStaminaEffect;
 	
 // Montage
 	UPROPERTY(EditAnywhere, Category = Animation)
@@ -142,7 +144,6 @@ public:
 	UTimelineComponent* GetStepBackMovementTimeline();
 
 protected:
-	// Todo #1 : 카메라 줌인 줌아웃 함수 lerp 써서 만들고 Roll이랑 step_back, aim 만들기
 	UFUNCTION()
 	void OnRollStepBackCameraTimelineUpdated(float Value);
 
@@ -192,4 +193,18 @@ public:
 
 	UPROPERTY()
 	uint8 bIsAiming : 1;
+
+	UPROPERTY()
+	uint8 bIsSprinting : 1;
+
+	UFUNCTION()
+	void StopRegenStamina();
+
+	UFUNCTION()
+	void StartRegenStaminaWithDelay(float DelayTime);
+
+	UFUNCTION()
+	void StartRegenStamina();
+	UPROPERTY()
+	uint8 bIsBlockedRegenStamina : 1;
 };

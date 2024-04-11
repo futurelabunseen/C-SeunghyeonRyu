@@ -30,6 +30,5 @@ protected:
 	void OnInterruptedCallback();
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TSubclassOf<class UGameplayEffect> RollStaminaEffect;
-
+	TSubclassOf<class UGameplayEffect> UseStaminaEffect;
 };

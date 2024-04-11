@@ -7,7 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/Attribute/UnseenCharacterAttributeSet.h"
-#include "AbilitySystem/Effect/GE_RollStamina.h"
+
 
 UGA_Roll::UGA_Roll()
 {
@@ -20,7 +20,7 @@ UGA_Roll::UGA_Roll()
 	CancelAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("Character.Action.Move"));
 	CancelAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("Character.Action.Aim"));
 
-	RollStaminaEffect = UGE_RollStamina::StaticClass();
+
 }
 
 void UGA_Roll::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -28,15 +28,19 @@ void UGA_Roll::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
-	UnseenCharacter->SetActorRotation(FRotationMatrix::MakeFromX(UnseenCharacter->GetLastMovementInputVector()).Rotator());
-	
-	// Use Stamina 따로 함수로 빼도 될 듯
-	FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(RollStaminaEffect);
+	UnseenCharacter->StopRegenStamina();
+	UnseenCharacter->StartRegenStaminaWithDelay(4.5f);
+
+	// Use Stamina
+	FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(UseStaminaEffect);
 	if (EffectSpecHandle.IsValid())
 	{
 		ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle);
 	}
 
+	// Roll Anim
+	
+	UnseenCharacter->SetActorRotation(FRotationMatrix::MakeFromX(UnseenCharacter->GetLastMovementInputVector()).Rotator());
 	UnseenCharacter->bIsRollStepBackActive = true;
 	UnseenCharacter->RollStepBackCameraLerp();
 	UAbilityTask_PlayMontageAndWait* PlayRollTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayRoll"), UnseenCharacter->GetRollMontage());
@@ -59,7 +63,7 @@ bool UGA_Roll::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 	// 스테미나 검사
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo_Checked();
 	const UUnseenCharacterAttributeSet* AttributeSet = ASC->GetSet<UUnseenCharacterAttributeSet>();
-	if (AttributeSet->GetStamina() < 30.0f) // 이거 30.0f를 GE_RollStamina에 cost 가져오는 방법 없을까 여기는 const함수
+	if (AttributeSet->GetStamina() < -AttributeSet->GetRollStaminaCost())
 	{
 		return false;
 	}
