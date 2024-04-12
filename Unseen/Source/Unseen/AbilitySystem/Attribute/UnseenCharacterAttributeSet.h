@@ -48,6 +48,6 @@ protected:
 	FGameplayAttributeData SprintStaminaCost;
 
 
-	//friend class UGE_RollStamina;
-	//friend class UGE_StepBackStamina;
+	friend class UGE_RollStamina; // Áö±Ý ¾È ¾¸
+	friend class UGE_StepBackStamina; // Áö±Ý ¾È ¾¸
 };
