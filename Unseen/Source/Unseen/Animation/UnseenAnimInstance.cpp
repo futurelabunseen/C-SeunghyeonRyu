@@ -38,5 +38,12 @@ void UUnseenAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		//UE_LOG(LogTemp, Warning, TEXT("bIsJumping : %u"), bIsJumping);
 		Direction = CalculateDirection(Velocity, Owner->GetActorRotation());
 		bIsAiming = Owner->bIsAiming;
+
+		if (bIsAiming)
+		{
+			Pitch = Owner->GetBaseAimRotation().Pitch;
+			if (Pitch >= 180) { Pitch -= 360.f; }
+		}
+		else { Pitch = 0; }
 	}
 }
