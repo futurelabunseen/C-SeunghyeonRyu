@@ -12,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "DrawDebugHelpers.h"
 
 AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 {
@@ -203,6 +204,22 @@ void AUnseenCharacterPlayer::BeginPlay()
 
 }
 
+void AUnseenCharacterPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	const FVector Forward = GetActorForwardVector();
+	FVector Start = GetActorLocation();
+	Start.Z = 0.f;
+	FVector RollDirection = (FVector(CalculateRollDirection().X, CalculateRollDirection().Y, 0.f)).GetSafeNormal();
+
+	DrawDebugDirectionalArrow(GetWorld(), Start, Start + Forward * 100.f,
+		5.f, FColor::Red, false, -1.f, 0, 2.f);
+
+	DrawDebugDirectionalArrow(GetWorld(), Start, Start + RollDirection * 100.f,
+		5.f, FColor::Yellow, false, -1.f, 0, 2.f);
+}
+
 void AUnseenCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -214,11 +231,6 @@ void AUnseenCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Pl
 
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::Move);
-		//EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::StopMoving);
-
-		//Sprinting
-		//EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::Sprint);
-		//EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::StopSprinting);
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::Look);
@@ -227,39 +239,8 @@ void AUnseenCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Pl
 
 void AUnseenCharacterPlayer::Move(const FInputActionValue& Value)
 {
-	LastInputMovementVector = Value.Get<FVector2D>();
-	
-
-	//FGameplayTagContainer CurrentOwnedGameplayTags;
-	//ASC->GetOwnedGameplayTags(CurrentOwnedGameplayTags);
-	//if (CurrentOwnedGameplayTags.HasTag(FGameplayTag::RequestGameplayTag("Character.State.IsMoving")))
-	//{
-	//	// input is a Vector2D
-	//	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	//	if (Controller != nullptr)
-	//	{
-	//		// find out which way is forward
-	//		const FRotator Rotation = Controller->GetControlRotation();
-	//		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-	//		// get forward vector
-	//		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
-	//		// get right vector 
-	//		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-	//		// add movement 
-	//		AddMovementInput(ForwardDirection, MovementVector.X);
-	//		AddMovementInput(RightDirection, MovementVector.Y);
-	//	}
-	//}
+	LastInputMoveValue = Value.Get<FVector2D>();
 }
-
-//void AUnseenCharacterPlayer::StopMoving()
-//{
-//	///bUseControllerRotationYaw = false;
-//}
 
 void AUnseenCharacterPlayer::Look(const FInputActionValue& Value)
 {
@@ -273,24 +254,6 @@ void AUnseenCharacterPlayer::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
-
-//void AUnseenCharacterPlayer::Sprint()
-//{
-//	FVector CharacterForward = GetActorForwardVector();
-//	FVector VelocityDirection = GetVelocity().GetSafeNormal();
-//	float MovementDirection = FVector::DotProduct(CharacterForward, VelocityDirection);
-//
-//	if (!GetCharacterMovement()->Velocity.IsNearlyZero() && MovementDirection > 0.5)
-//	{
-//		GetCharacterMovement()->MaxWalkSpeed = 500.f;
-//	}
-//}
-//
-//void AUnseenCharacterPlayer::StopSprinting()
-//{
-//	GetCharacterMovement()->MaxWalkSpeed = 300.f;
-//}
-
 
 //Ability System
 UAbilitySystemComponent* AUnseenCharacterPlayer::GetAbilitySystemComponent() const
@@ -410,8 +373,6 @@ void AUnseenCharacterPlayer::AimCameraLerp()
 
 void AUnseenCharacterPlayer::OnRollStepBackCameraTimelineUpdated(float Value)
 {
-	//float CurrentTargetArmLength = GetSpringArmComponent()->TargetArmLength;
-
 	if (AimCameraTimeline->IsPlaying())
 	{
 		AimCameraTimeline->Stop();
@@ -425,15 +386,6 @@ void AUnseenCharacterPlayer::OnRollStepBackCameraTimelineUpdated(float Value)
 	{
 		GetSpringArmComponent()->TargetArmLength = FMath::Lerp(200, CurrentTargetArmLength, Value);
 	}
-
-	/*if (bIsRollStepBackActive)
-	{
-		GetSpringArmComponent()->TargetArmLength = FMath::Max(CurrentTargetArmLength, Value);
-	}
-	else
-	{
-		GetSpringArmComponent()->TargetArmLength = FMath::Min(CurrentTargetArmLength, Value);
-	}*/
 }
 
 void AUnseenCharacterPlayer::OnAimCameraTimelineUpdated(float Value)
@@ -453,9 +405,9 @@ void AUnseenCharacterPlayer::OnAimCameraTimelineUpdated(float Value)
 	}
 }
 
-FVector2D AUnseenCharacterPlayer::GetLastInputMovementVector()
+FVector2D AUnseenCharacterPlayer::GetLastInputMoveValue()
 {
-	return LastInputMovementVector;
+	return LastInputMoveValue;
 }
 
 void AUnseenCharacterPlayer::UpdateCurrentTargetArmLength()
@@ -495,4 +447,20 @@ void AUnseenCharacterPlayer::StartRegenStamina()
 		ASC->RemoveLooseGameplayTag(FGameplayTag::RequestGameplayTag("Character.State.BlockedRegenStamina"));
 		bIsBlockedRegenStamina = false;
 	}
+}
+
+FVector AUnseenCharacterPlayer::CalculateRollDirection()
+{
+	// find out which way is forward
+	const FRotator Rotation = Controller->GetControlRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	// get forward vector
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+	// get right vector 
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+	return (ForwardDirection * LastInputMoveValue.X) + (RightDirection * LastInputMoveValue.Y);
+
 }

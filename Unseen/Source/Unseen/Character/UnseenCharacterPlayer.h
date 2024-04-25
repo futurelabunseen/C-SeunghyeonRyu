@@ -23,6 +23,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -166,7 +167,7 @@ protected:
 	FOnTimelineFloat AimCameraTimeLineInterpFunction{};
 
 	UPROPERTY()
-	FVector2D LastInputMovementVector;
+	FVector2D LastInputMoveValue;
 
 	UPROPERTY()
 	float CurrentTargetArmLength;
@@ -181,7 +182,7 @@ public:
 	void AimCameraLerp();
 
 	UFUNCTION()
-	FVector2D GetLastInputMovementVector();
+	FVector2D GetLastInputMoveValue();
 
 	UFUNCTION()
 	void UpdateCurrentTargetArmLength();
@@ -207,4 +208,7 @@ public:
 	void StartRegenStamina();
 	UPROPERTY()
 	uint8 bIsBlockedRegenStamina : 1;
+
+	UFUNCTION()
+	FVector CalculateRollDirection();
 };

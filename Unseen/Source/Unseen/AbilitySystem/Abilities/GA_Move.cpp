@@ -63,7 +63,7 @@ void UGA_Move::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGame
 {
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 	// input is a Vector2D
-	FVector2D MovementVector = UnseenCharacter->GetLastInputMovementVector();
+	FVector2D MovementVector = UnseenCharacter->GetLastInputMoveValue();
 
 	if (UnseenCharacter->Controller != nullptr)
 	{

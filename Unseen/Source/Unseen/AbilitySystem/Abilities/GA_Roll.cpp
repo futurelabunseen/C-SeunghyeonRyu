@@ -40,7 +40,8 @@ void UGA_Roll::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FG
 
 	// Roll Anim
 	
-	UnseenCharacter->SetActorRotation(FRotationMatrix::MakeFromX(UnseenCharacter->GetLastMovementInputVector()).Rotator());
+	UnseenCharacter->SetActorRotation(UnseenCharacter->CalculateRollDirection().Rotation().Quaternion());
+	//UnseenCharacter->SetActorRotation(FRotationMatrix::MakeFromX(UnseenCharacter->CalculateRollDirection()).Rotator());
 	UnseenCharacter->bIsRollStepBackActive = true;
 	UnseenCharacter->RollStepBackCameraLerp();
 	UAbilityTask_PlayMontageAndWait* PlayRollTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayRoll"), UnseenCharacter->GetRollMontage());
