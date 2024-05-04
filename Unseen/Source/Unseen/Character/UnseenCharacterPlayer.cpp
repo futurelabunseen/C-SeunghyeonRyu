@@ -12,6 +12,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "UI/UnseenCharacterHUD.h"
+#include "Blueprint/UserWidget.h"
 #include "DrawDebugHelpers.h"
 
 AUnseenCharacterPlayer::AUnseenCharacterPlayer()
@@ -34,6 +36,17 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	bIsRollStepBackActive = true;
 	bIsBlockedRegenStamina = false;
 	bIsSprinting = false;
+
+	// HUD
+	static ConstructorHelpers::FClassFinder<UUserWidget> HUDClassRef(TEXT("/Game/UI/WBP_UnseenPlayerHUD.WBP_UnseenPlayerHUD_C"));
+	if (HUDClassRef.Class)
+	{
+		PlayerHUDClass = HUDClassRef.Class;
+	}
+	PlayerHUD = nullptr;
+
+	// Weapon
+
 
 	// Input
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/ThirdPerson/Input/IMC_Default.IMC_Default'"));
@@ -178,6 +191,15 @@ void AUnseenCharacterPlayer::BeginPlay()
 		//Subsystem->RemoveMappingContext(DefaultMappingContext);
 	}
 
+	if (PlayerHUDClass) // 멀티하면 IsLocallyControlled()
+	{
+		PlayerHUD = CreateWidget<UUnseenCharacterHUD>(PlayerController, PlayerHUDClass);
+		if (PlayerHUD != nullptr)
+		{
+			PlayerHUD->AddToPlayerScreen();
+		}
+	}
+
 	// Roll Movement Timeline
 	RollTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnRollMovementTimelineUpdated") });
 	RollMovementTimeline->AddInterpFloat(RollMovementCurve, RollTimeLineInterpFunction);
@@ -202,6 +224,17 @@ void AUnseenCharacterPlayer::BeginPlay()
 	AimCameraTimeline->SetTimelineLength(0.3f);
 	AimCameraTimeline->SetLooping(false);
 
+}
+
+void AUnseenCharacterPlayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (PlayerHUD)
+	{
+		PlayerHUD->RemoveFromParent();
+		PlayerHUD = nullptr;
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void AUnseenCharacterPlayer::Tick(float DeltaTime)

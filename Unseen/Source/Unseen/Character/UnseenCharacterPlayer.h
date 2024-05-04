@@ -23,6 +23,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Tick(float DeltaTime) override;
 
 public:
@@ -40,28 +41,28 @@ protected:
 // Input Section
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputMappingContext* DefaultMappingContext;
+	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* JumpAction;
+	TObjectPtr<class UInputAction> JumpAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* MoveAction;
+	TObjectPtr<class UInputAction> MoveAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
+	TObjectPtr<class UInputAction> LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* SprintAction;
+	TObjectPtr<class UInputAction> SprintAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* RollAction;
+	TObjectPtr<class UInputAction> RollAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* StepBackAction;
+	TObjectPtr<class UInputAction> StepBackAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* AimAction;
+	TObjectPtr<class UInputAction> AimAction;
 
 	void Move(const FInputActionValue& Value);
 	//void StopMoving();
@@ -108,10 +109,10 @@ protected:
 	
 // Roll
 	UPROPERTY()
-	UTimelineComponent* RollMovementTimeline;
+	TObjectPtr<class UTimelineComponent> RollMovementTimeline;
 
 	UPROPERTY()
-	UCurveFloat* RollMovementCurve;
+	TObjectPtr<class UCurveFloat> RollMovementCurve;
 
 	UFUNCTION()
 	void OnRollMovementTimelineUpdated(float Value);
@@ -123,10 +124,10 @@ protected:
 
 // StepBack
 	UPROPERTY()
-	UTimelineComponent* StepBackMovementTimeline;
+	TObjectPtr<class UTimelineComponent> StepBackMovementTimeline;
 
 	UPROPERTY()
-	UCurveFloat* StepBackMovementCurve;
+	TObjectPtr<class UCurveFloat> StepBackMovementCurve;
 
 	UFUNCTION()
 	void OnStepBackMovementTimelineUpdated(float Value);
@@ -152,16 +153,16 @@ protected:
 	void OnAimCameraTimelineUpdated(float Value);
 
 	UPROPERTY()
-	UCurveFloat* RollStepBackCameraCurve;
+	TObjectPtr<class UCurveFloat> RollStepBackCameraCurve;
 
 	UPROPERTY()
-	UCurveFloat* AimCameraCurve;
+	TObjectPtr<class UCurveFloat> AimCameraCurve;
 
 	UPROPERTY()
-	UTimelineComponent* RollStepBackCameraTimeline;
+	TObjectPtr<class UTimelineComponent> RollStepBackCameraTimeline;
 
 	UPROPERTY()
-	UTimelineComponent* AimCameraTimeline;
+	TObjectPtr<class UTimelineComponent> AimCameraTimeline;
 
 	FOnTimelineFloat RollStepBackCameraTimeLineInterpFunction{};
 	FOnTimelineFloat AimCameraTimeLineInterpFunction{};
@@ -211,4 +212,18 @@ public:
 
 	UFUNCTION()
 	FVector CalculateRollDirection();
+
+	// HUD
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUnseenCharacterHUD> PlayerHUDClass;
+
+	UPROPERTY()
+	TObjectPtr<class UUnseenCharacterHUD> PlayerHUD;
+
+	// Weapon
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUnseenCharacterHUD> AssultRifleClass;
+
+	UPROPERTY()
+	TObjectPtr<class UUnseenCharacterHUD> AssultRifle;
 };
