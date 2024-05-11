@@ -222,8 +222,8 @@ public:
 
 	// Weapon
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UUnseenCharacterHUD> AssultRifleClass;
+	TSubclassOf<class AActor> AssaultRifleBPClass;
 
 	UPROPERTY()
-	TObjectPtr<class UUnseenCharacterHUD> AssultRifle;
+	TObjectPtr<class AActor> AssaultRifle;
 };

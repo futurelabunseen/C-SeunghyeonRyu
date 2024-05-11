@@ -14,6 +14,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "UI/UnseenCharacterHUD.h"
 #include "Blueprint/UserWidget.h"
+#include "Weapon/AssaultRifle.h"
 #include "DrawDebugHelpers.h"
 
 AUnseenCharacterPlayer::AUnseenCharacterPlayer()
@@ -46,7 +47,12 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	PlayerHUD = nullptr;
 
 	// Weapon
-
+	static ConstructorHelpers::FClassFinder<AActor> AssaultRifleBPClassRef(TEXT("/Game/Weapon/USBP_Assault_Rifle.USBP_Assault_Rifle_C"));
+	if (AssaultRifleBPClassRef.Class)
+	{
+		AssaultRifleBPClass = AssaultRifleBPClassRef.Class;
+	}
+	AssaultRifle = nullptr;
 
 	// Input
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/ThirdPerson/Input/IMC_Default.IMC_Default'"));
@@ -197,6 +203,15 @@ void AUnseenCharacterPlayer::BeginPlay()
 		if (PlayerHUD != nullptr)
 		{
 			PlayerHUD->AddToPlayerScreen();
+		}
+	}
+
+	if (AssaultRifleBPClass) // 멀티하면 IsLocallyControlled()
+	{
+		AssaultRifle = GetWorld()->SpawnActor<AAssaultRifle>(AssaultRifleBPClass, FVector::ZeroVector, FRotator::ZeroRotator);
+		if (AssaultRifle != nullptr)
+		{
+			AssaultRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("RH_Rifle"));
 		}
 	}
 
