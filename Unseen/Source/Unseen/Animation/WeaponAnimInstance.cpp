@@ -47,21 +47,24 @@ void UWeaponAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UWeaponAnimInstance::PlayShootMontage(EWeaponPart part)
 {
-	switch (part)
+	if (!MontageInstances.Num())
 	{
-	case EWeaponPart::MainBody:
-		Montage_Play(MainBodyShootMontage, ShootRate);
-		break;
-	case EWeaponPart::BulletSleeve:
-		Montage_Play(SleeveShootMontage, ShootRate);
-		break;
-
-	}
+		switch (part)
+		{
+		case EWeaponPart::MainBody:
+			Montage_Play(MainBodyShootMontage, ShootRate);
+			break;
+		case EWeaponPart::BulletSleeve:
+			Montage_Play(SleeveShootMontage, ShootRate);
+			break;
+		}
+	}	
+	Montage_SetNextSection(FName("Default"), FName("End"));
 }
 
 void UWeaponAnimInstance::StopShootMontage()
 {
-	Montage_Stop(0.0f);
+	Montage_SetNextSection(FName("Default"), FName("Default"));
 }
 
 void UWeaponAnimInstance::UpdateShootRate()
