@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Weapon/UnseenWeaponBase.h"
 #include "Animation/WeaponAnimInstance.h"
+#include "Animation/AnimNotify_Shoot.h"
 #include "AssaultRifle.generated.h"
 UCLASS()
 class UNSEEN_API AAssaultRifle : public AUnseenWeaponBase
@@ -25,6 +26,8 @@ public:
 
 	void ShootingStart() override;
 	void ShootingStop() override;
+
+	void ShootWeapon();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon Parts", meta = (AllowPrivateAccess = "true"))
@@ -64,5 +67,10 @@ protected:
 	TObjectPtr<class UWeaponAnimInstance> MagazineAnimInstance;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim Instance", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UWeaponAnimInstance> BulletSleeveAnimInstance;
+
+
+
+	UPROPERTY(EditAnywhere, Category = Animation)
+	TObjectPtr<class UAnimMontage> MainBodyShootMontage;
 
 };
