@@ -14,7 +14,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "UI/UnseenCharacterHUD.h"
 #include "Blueprint/UserWidget.h"
-#include "Weapon/AssaultRifle.h"
 #include "DrawDebugHelpers.h"
 
 AUnseenCharacterPlayer::AUnseenCharacterPlayer()
@@ -53,6 +52,7 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 		AssaultRifleBPClass = AssaultRifleBPClassRef.Class;
 	}
 	AssaultRifle = nullptr;
+	WeaponOnHand = nullptr;
 
 	// Input
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/ThirdPerson/Input/IMC_Default.IMC_Default'"));
@@ -101,6 +101,12 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	if (nullptr != InputActionAimRef.Object)
 	{
 		AimAction = InputActionAimRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionShootRef(TEXT("/Script/EnhancedInput.InputAction'/Game/ThirdPerson/Input/Actions/IA_Shoot.IA_Shoot'"));
+	if (nullptr != InputActionShootRef.Object)
+	{
+		ShootAction = InputActionShootRef.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> RollMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/AM_Roll_Rifle.AM_Roll_Rifle'"));
@@ -154,7 +160,7 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
+	
 	AUnseenPlayerState* UnseenPlayerState = GetPlayerState<AUnseenPlayerState>();
 	if (UnseenPlayerState)
 	{
@@ -197,21 +203,23 @@ void AUnseenCharacterPlayer::BeginPlay()
 		//Subsystem->RemoveMappingContext(DefaultMappingContext);
 	}
 
-	if (PlayerHUDClass) // 멀티하면 IsLocallyControlled()
+	if (PlayerHUDClass) // 멀티하면 IsLocallyControlled() 찾아보기
 	{
 		PlayerHUD = CreateWidget<UUnseenCharacterHUD>(PlayerController, PlayerHUDClass);
-		if (PlayerHUD != nullptr)
+		if (nullptr != PlayerHUD)
 		{
 			PlayerHUD->AddToPlayerScreen();
 		}
 	}
 
-	if (AssaultRifleBPClass) // 멀티하면 IsLocallyControlled()
+	if (AssaultRifleBPClass)
 	{
 		AssaultRifle = GetWorld()->SpawnActor<AAssaultRifle>(AssaultRifleBPClass, FVector::ZeroVector, FRotator::ZeroRotator);
-		if (AssaultRifle != nullptr)
+
+		if (nullptr != AssaultRifle)
 		{
 			AssaultRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("RH_Rifle"));
+			WeaponOnHand = AssaultRifle;
 		}
 	}
 
@@ -295,7 +303,7 @@ void AUnseenCharacterPlayer::Look(const FInputActionValue& Value)
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr)
+	if (nullptr != Controller)
 	{
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
@@ -320,21 +328,24 @@ void AUnseenCharacterPlayer::SetupGASInputComponent()
 	{
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 0);
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 0);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 1);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 1);
 
-		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 1);
+		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 2);
 
-		EnhancedInputComponent->BindAction(StepBackAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 2);
+		EnhancedInputComponent->BindAction(StepBackAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 3);
 
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 3);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 3);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 4);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 4);
 
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 4);
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 4);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 5);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 5);
 
-		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 5);
-		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 5);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 6);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 6);
+
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 7);
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 7);
 		
 	}
 }
@@ -511,4 +522,16 @@ FVector AUnseenCharacterPlayer::CalculateRollDirection()
 
 	return (ForwardDirection * LastInputMoveValue.X) + (RightDirection * LastInputMoveValue.Y);
 
+}
+
+AUnseenWeaponBase* AUnseenCharacterPlayer::GetWeaponOnHand()
+{
+	if (nullptr != WeaponOnHand)
+	{
+		return WeaponOnHand;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("No Weapon On-Hand"));
+
+	return nullptr;
 }

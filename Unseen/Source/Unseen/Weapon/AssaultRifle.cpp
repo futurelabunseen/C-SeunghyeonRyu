@@ -85,21 +85,34 @@ AAssaultRifle::AAssaultRifle()
 	Silencer->SetRelativeLocation(FVector(-62.28f, 0, 7.21f));
 	Magazine->SetRelativeLocation(FVector(-16.63f, 0, 4.99f));
 	BulletSleeve->SetRelativeLocation(FVector(-25.77f, 0, 9.59f));
-	
-
 }
 
 // Called when the game starts or when spawned
 void AAssaultRifle::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	MainBodyAnimInstance = CastChecked<UWeaponAnimInstance>(MainBody->GetAnimInstance());
+	MagazineAnimInstance = CastChecked<UWeaponAnimInstance>(Magazine->GetAnimInstance());
+	BulletSleeveAnimInstance = CastChecked<UWeaponAnimInstance>(BulletSleeve->GetAnimInstance());
 }
 
 // Called every frame
 void AAssaultRifle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+}
 
+void AAssaultRifle::ShootingStart()
+{
+	MainBodyAnimInstance->PlayShootMontage(EWeaponPart::MainBody);
+	BulletSleeveAnimInstance->PlayShootMontage(EWeaponPart::BulletSleeve);
+}
+
+void AAssaultRifle::ShootingStop()
+{
+	MainBodyAnimInstance->StopShootMontage();
+	BulletSleeveAnimInstance->StopShootMontage();
 }
 

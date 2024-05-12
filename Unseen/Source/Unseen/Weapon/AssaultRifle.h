@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Weapon/UnseenWeaponBase.h"
+#include "Animation/WeaponAnimInstance.h"
 #include "AssaultRifle.generated.h"
-
 UCLASS()
-class UNSEEN_API AAssaultRifle : public AActor
+class UNSEEN_API AAssaultRifle : public AUnseenWeaponBase
 {
 	GENERATED_BODY()
 	
@@ -22,6 +22,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void ShootingStart() override;
+	void ShootingStop() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon Parts", meta = (AllowPrivateAccess = "true"))
@@ -54,5 +57,12 @@ protected:
 	TObjectPtr<class USkeletalMesh> MagazineSKMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SkeletalMesh, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USkeletalMesh> BulletSleeveSKMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim Instance", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UWeaponAnimInstance> MainBodyAnimInstance;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim Instance", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UWeaponAnimInstance> MagazineAnimInstance;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim Instance", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UWeaponAnimInstance> BulletSleeveAnimInstance;
 
 };

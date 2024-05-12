@@ -29,6 +29,7 @@ public:
 	ATTRIBUTE_ACCESSORS(UUnseenCharacterAttributeSet, RollStaminaCost);
 	ATTRIBUTE_ACCESSORS(UUnseenCharacterAttributeSet, StepBackStaminaCost);
 	ATTRIBUTE_ACCESSORS(UUnseenCharacterAttributeSet, SprintStaminaCost);
+	ATTRIBUTE_ACCESSORS(UUnseenCharacterAttributeSet, ShootRate);
 
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
@@ -47,6 +48,8 @@ protected:
 	FGameplayAttributeData StepBackStaminaCost;
 	UPROPERTY(BlueprintReadOnly, Category = "CharacterInfo", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData SprintStaminaCost;
+	UPROPERTY(BlueprintReadOnly, Category = "CharacterInfo", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData ShootRate;
 
 
 	friend class UGE_RollStamina; // Áö±Ý ¾È ¾¸

@@ -2,7 +2,6 @@
 
 
 #include "Animation/UnseenAnimInstance.h"
-//#include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -10,6 +9,7 @@ UUnseenAnimInstance::UUnseenAnimInstance()
 {
 	MovingThreshold = 3.0f;
 	JumpingThreshold = 100.0f;
+	
 }
 
 void UUnseenAnimInstance::NativeInitializeAnimation()
@@ -22,6 +22,8 @@ void UUnseenAnimInstance::NativeInitializeAnimation()
 		Movement = Owner->GetCharacterMovement();
 	}
 }
+
+
 
 void UUnseenAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
@@ -47,3 +49,4 @@ void UUnseenAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		else { Pitch = 0; }
 	}
 }
+

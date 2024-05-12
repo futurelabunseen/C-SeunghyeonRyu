@@ -8,13 +8,13 @@
 #include "UnseenAnimInstance.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class UNSEEN_API UUnseenAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
-	
+
 public:
 	UUnseenAnimInstance();
 

@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "AbilitySystemInterface.h"
 #include "Components/TimelineComponent.h"
+#include "Weapon/AssaultRifle.h"
 #include "UnseenCharacterPlayer.generated.h"
 
 /**
@@ -63,6 +64,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> AimAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ShootAction;
 
 	void Move(const FInputActionValue& Value);
 	//void StopMoving();
@@ -222,8 +226,14 @@ public:
 
 	// Weapon
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AActor> AssaultRifleBPClass;
+	TSubclassOf<class AAssaultRifle> AssaultRifleBPClass;
 
 	UPROPERTY()
-	TObjectPtr<class AActor> AssaultRifle;
+	TObjectPtr<class AAssaultRifle> AssaultRifle;
+
+	UPROPERTY()
+	TObjectPtr<class AUnseenWeaponBase> WeaponOnHand;
+
+	UFUNCTION()
+	AUnseenWeaponBase* GetWeaponOnHand();
 };
