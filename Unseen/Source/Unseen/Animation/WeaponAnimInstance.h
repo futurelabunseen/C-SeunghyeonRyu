@@ -29,11 +29,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	float ShootRate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
-	uint8 bIsWeapon : 1;
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+	uint8 bIsWeapon : 1;*/
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
-	uint8 bIsShooting : 1;
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+	uint8 bIsShooting : 1;*/
 
 	UPROPERTY(EditAnywhere, Category = Animation)
 	TObjectPtr<class UAnimMontage> MainBodyShootMontage;
@@ -42,6 +42,6 @@ protected:
 
 public:
 	void PlayShootMontage(EWeaponPart part);
-	void StopShootMontage();
+	void StopShootMontage(EWeaponPart part);
 	void UpdateShootRate();
 };

@@ -8,6 +8,8 @@
 #include "AbilitySystemInterface.h"
 #include "Components/TimelineComponent.h"
 #include "Weapon/AssaultRifle.h"
+#include "Animation/AnimNotify_Shoot.h"
+#include "Animation/AnimNotify_ShootEnd.h"
 #include "UnseenCharacterPlayer.generated.h"
 
 /**
@@ -84,6 +86,7 @@ public:
 public:
 	FORCEINLINE class UAnimMontage* GetRollMontage() const { return RollMontage; }
 	FORCEINLINE class UAnimMontage* GetStepBackMontage() const { return StepBackMontage; }
+	FORCEINLINE class UAnimMontage* GetShootingMontage() const { return ShootingMontage; }
 
 protected:
 	void SetupGASInputComponent();
@@ -108,6 +111,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = Animation)
 	TObjectPtr<class UAnimMontage> StepBackMontage;
+
+	UPROPERTY(EditAnywhere, Category = Animation)
+	TObjectPtr<class UAnimMontage> ShootingMontage;
 
 // Montage Timeline
 	
@@ -203,6 +209,9 @@ public:
 	UPROPERTY()
 	uint8 bIsSprinting : 1;
 
+	UPROPERTY()
+	uint8 bIsShooting : 1;
+
 	UFUNCTION()
 	void StopRegenStamina();
 
@@ -236,4 +245,15 @@ public:
 
 	UFUNCTION()
 	AUnseenWeaponBase* GetWeaponOnHand();
+
+	UFUNCTION()
+	void ShootWeapon();
+
+	UFUNCTION()
+	void ShootWeaponEnd();
+
+protected:
+	UPROPERTY(EditAnywhere, Category = Animation)
+	TObjectPtr<class UAnimMontage> RifleMainBodyShootMontage;
+
 };

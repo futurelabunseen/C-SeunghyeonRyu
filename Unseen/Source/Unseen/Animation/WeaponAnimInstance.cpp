@@ -6,7 +6,7 @@
 
 UWeaponAnimInstance::UWeaponAnimInstance()
 {
-	bIsWeapon = false;
+	//bIsWeapon = false;
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> MainBodyShootMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Weapon/AnimMontage/AM_Shooting_Automatic_Assault_Rifle.AM_Shooting_Automatic_Assault_Rifle'"));
 	if (MainBodyShootMontageRef.Succeeded())
@@ -30,7 +30,7 @@ void UWeaponAnimInstance::NativeInitializeAnimation()
 	Weapon = Cast<AUnseenWeaponBase>(GetOwningActor());
 	if (Weapon)
 	{
-		bIsWeapon = true;
+		//bIsWeapon = true;
 		UpdateShootRate();
 	}
 }
@@ -39,32 +39,38 @@ void UWeaponAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	if (bIsWeapon)
+	/*if (bIsWeapon)
 	{
 		bIsShooting = Weapon->bIsShooting;
-	}
+	}*/
 }
 
 void UWeaponAnimInstance::PlayShootMontage(EWeaponPart part)
 {
-	if (!MontageInstances.Num())
+	switch (part)
 	{
-		switch (part)
-		{
-		case EWeaponPart::MainBody:
+	case EWeaponPart::MainBody:
+		if (!Montage_IsActive(MainBodyShootMontage))
 			Montage_Play(MainBodyShootMontage, ShootRate);
-			break;
-		case EWeaponPart::BulletSleeve:
+		break;
+	case EWeaponPart::BulletSleeve:
+		if (!Montage_IsActive(SleeveShootMontage))
 			Montage_Play(SleeveShootMontage, ShootRate);
-			break;
-		}
+		break;
 	}	
-	Montage_SetNextSection(FName("Default"), FName("End"));
 }
 
-void UWeaponAnimInstance::StopShootMontage()
+void UWeaponAnimInstance::StopShootMontage(EWeaponPart part)
 {
-	Montage_SetNextSection(FName("Default"), FName("Default"));
+	switch (part)
+	{
+	case EWeaponPart::MainBody:
+		Montage_Stop(0.0f, MainBodyShootMontage);
+		break;
+	case EWeaponPart::BulletSleeve:
+		Montage_Stop(0.0f, SleeveShootMontage);
+		break;
+	}
 }
 
 void UWeaponAnimInstance::UpdateShootRate()

@@ -36,6 +36,7 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	bIsRollStepBackActive = true;
 	bIsBlockedRegenStamina = false;
 	bIsSprinting = false;
+	bIsShooting = false;
 
 	// HUD
 	static ConstructorHelpers::FClassFinder<UUserWidget> HUDClassRef(TEXT("/Game/UI/WBP_UnseenPlayerHUD.WBP_UnseenPlayerHUD_C"));
@@ -119,6 +120,18 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	if (StepBackMontageRef.Succeeded())
 	{
 		StepBackMontage = StepBackMontageRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> ShootingMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/AM_Shooting_Burst_Montage.AM_Shooting_Burst_Montage'"));
+	if (ShootingMontageRef.Succeeded())
+	{
+		ShootingMontage = ShootingMontageRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> RifleMainBodyShootMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Weapon/AnimMontage/AM_Shooting_Automatic_Assault_Rifle.AM_Shooting_Automatic_Assault_Rifle'"));
+	if (RifleMainBodyShootMontageRef.Succeeded())
+	{
+		RifleMainBodyShootMontage = RifleMainBodyShootMontageRef.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> RollMovementCurveRef(TEXT("/Script/Engine.CurveFloat'/Game/Animation/FloatCurve_Roll.FloatCurve_Roll'"));
@@ -247,6 +260,22 @@ void AUnseenCharacterPlayer::BeginPlay()
 	AimCameraTimeline->SetTimelineLength(0.3f);
 	AimCameraTimeline->SetLooping(false);
 
+	if (RifleMainBodyShootMontage)
+	{
+		const auto NotifyEvents = RifleMainBodyShootMontage->Notifies;
+		for (FAnimNotifyEvent EventNotify : NotifyEvents)
+		{
+			if (const auto ShootingNotify = Cast<UAnimNotify_Shoot>(EventNotify.Notify))
+			{
+				ShootingNotify->OnNotified.AddUObject(this, &AUnseenCharacterPlayer::ShootWeapon);
+			}
+
+			if (const auto ShootingNotify = Cast<UAnimNotify_ShootEnd>(EventNotify.Notify))
+			{
+				ShootingNotify->OnNotified.AddUObject(this, &AUnseenCharacterPlayer::ShootWeaponEnd);
+			}
+		}
+	}
 }
 
 void AUnseenCharacterPlayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -534,4 +563,21 @@ AUnseenWeaponBase* AUnseenCharacterPlayer::GetWeaponOnHand()
 	UE_LOG(LogTemp, Warning, TEXT("No Weapon On-Hand"));
 
 	return nullptr;
+}
+
+void AUnseenCharacterPlayer::ShootWeapon()
+{
+	UE_LOG(LogTemp, Warning, TEXT("WeaponStart Notify"));
+	GetWeaponOnHand()->ShootWeapon();
+}
+
+void AUnseenCharacterPlayer::ShootWeaponEnd()
+{
+	UE_LOG(LogTemp, Warning, TEXT("WeaponEnd Notify"));
+	if (!bIsShooting)
+	{
+		GetMesh()->GetAnimInstance()->Montage_Stop(0.5f, ShootingMontage);
+		GetWeaponOnHand()->ShootingStop();
+	}
+	
 }

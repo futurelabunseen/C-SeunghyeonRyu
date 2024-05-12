@@ -32,11 +32,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void ShootingStart();
+	UFUNCTION()
+	virtual void ShootingMontageStart();
+	UFUNCTION()
 	virtual void ShootingStop();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = State)
-	uint8 bIsShooting : 1;
+	UFUNCTION()
+	virtual void ShootWeapon();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
 	float ShootRate;

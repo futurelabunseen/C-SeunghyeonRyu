@@ -86,11 +86,7 @@ AAssaultRifle::AAssaultRifle()
 	Magazine->SetRelativeLocation(FVector(-16.63f, 0, 4.99f));
 	BulletSleeve->SetRelativeLocation(FVector(-25.77f, 0, 9.59f));
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> MainBodyShootMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Weapon/AnimMontage/AM_Shooting_Automatic_Assault_Rifle.AM_Shooting_Automatic_Assault_Rifle'"));
-	if (MainBodyShootMontageRef.Succeeded())
-	{
-		MainBodyShootMontage = MainBodyShootMontageRef.Object;
-	}
+	
 }
 
 // Called when the game starts or when spawned
@@ -102,17 +98,7 @@ void AAssaultRifle::BeginPlay()
 	MagazineAnimInstance = CastChecked<UWeaponAnimInstance>(Magazine->GetAnimInstance());
 	BulletSleeveAnimInstance = CastChecked<UWeaponAnimInstance>(BulletSleeve->GetAnimInstance());
 
-	if (MainBodyShootMontage)
-	{
-		const auto NotifyEvents = MainBodyShootMontage->Notifies;
-		for (FAnimNotifyEvent EventNotify : NotifyEvents)
-		{
-			if (const auto ShootingNotify = Cast<UAnimNotify_Shoot>(EventNotify.Notify))
-			{
-				ShootingNotify->OnNotified.AddUObject(this, &AAssaultRifle::ShootWeapon);
-			}
-		}
-	}
+	
 }
 
 // Called every frame
@@ -122,7 +108,7 @@ void AAssaultRifle::Tick(float DeltaTime)
 	
 }
 
-void AAssaultRifle::ShootingStart()
+void AAssaultRifle::ShootingMontageStart()
 {
 	MainBodyAnimInstance->PlayShootMontage(EWeaponPart::MainBody);
 	BulletSleeveAnimInstance->PlayShootMontage(EWeaponPart::BulletSleeve);
@@ -130,12 +116,12 @@ void AAssaultRifle::ShootingStart()
 
 void AAssaultRifle::ShootingStop()
 {
-	MainBodyAnimInstance->StopShootMontage();
-	BulletSleeveAnimInstance->StopShootMontage();
+	MainBodyAnimInstance->StopShootMontage(EWeaponPart::MainBody);
+	BulletSleeveAnimInstance->StopShootMontage(EWeaponPart::BulletSleeve);
 }
 
 void AAssaultRifle::ShootWeapon()
 {
-	UE_LOG(LogTemp, Warning, TEXT("bangbangbang"));
+	//รั น฿ป็ ทฮม๗
 }
 
