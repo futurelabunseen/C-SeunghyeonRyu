@@ -303,6 +303,7 @@ void AUnseenCharacterPlayer::Tick(float DeltaTime)
 
 	DrawDebugDirectionalArrow(GetWorld(), Start, Start + RollDirection * 100.f,
 		5.f, FColor::Yellow, false, -1.f, 0, 2.f);
+
 }
 
 void AUnseenCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
