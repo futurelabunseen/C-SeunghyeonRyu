@@ -86,7 +86,7 @@ AAssaultRifle::AAssaultRifle()
 	Magazine->SetRelativeLocation(FVector(-16.63f, 0, 4.99f));
 	BulletSleeve->SetRelativeLocation(FVector(-25.77f, 0, 9.59f));
 
-	
+	MaxAmmo = 30;
 }
 
 // Called when the game starts or when spawned
@@ -98,7 +98,7 @@ void AAssaultRifle::BeginPlay()
 	MagazineAnimInstance = CastChecked<UWeaponAnimInstance>(Magazine->GetAnimInstance());
 	BulletSleeveAnimInstance = CastChecked<UWeaponAnimInstance>(BulletSleeve->GetAnimInstance());
 
-	
+	CurrentAmmo = MaxAmmo;
 }
 
 // Called every frame
@@ -122,6 +122,11 @@ void AAssaultRifle::ShootingStop()
 
 void AAssaultRifle::ShootWeapon()
 {
+	CurrentAmmo -= 1;
+	UE_LOG(LogTemp, Warning, TEXT("Current Ammo : %d"), CurrentAmmo);
+	
 	//รั น฿ป็ ทฮม๗
+
+	
 }
 

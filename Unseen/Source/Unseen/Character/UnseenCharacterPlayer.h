@@ -10,6 +10,7 @@
 #include "Weapon/AssaultRifle.h"
 #include "Animation/AnimNotify_Shoot.h"
 #include "Animation/AnimNotify_ShootEnd.h"
+#include "Animation/AnimNotify_ReloadEnd.h"
 #include "UnseenCharacterPlayer.generated.h"
 
 /**
@@ -69,6 +70,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ShootAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ReloadAction;
 
 	void Move(const FInputActionValue& Value);
 	//void StopMoving();
@@ -87,6 +90,7 @@ public:
 	FORCEINLINE class UAnimMontage* GetRollMontage() const { return RollMontage; }
 	FORCEINLINE class UAnimMontage* GetStepBackMontage() const { return StepBackMontage; }
 	FORCEINLINE class UAnimMontage* GetShootingMontage() const { return ShootingMontage; }
+	FORCEINLINE class UAnimMontage* GetReloadMontage() const { return ReloadMontage; }
 
 protected:
 	void SetupGASInputComponent();
@@ -114,6 +118,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = Animation)
 	TObjectPtr<class UAnimMontage> ShootingMontage;
+	UPROPERTY(EditAnywhere, Category = Animation)
+	TObjectPtr<class UAnimMontage> ReloadMontage;
 
 // Montage Timeline
 	
@@ -252,8 +258,18 @@ public:
 	UFUNCTION()
 	void ShootWeaponEnd();
 
+	UFUNCTION()
+	void ReloadMontageEnd();
+	UFUNCTION()
+	bool IsCanReload();
+
 protected:
 	UPROPERTY(EditAnywhere, Category = Animation)
 	TObjectPtr<class UAnimMontage> RifleMainBodyShootMontage;
 
+	UPROPERTY(EditAnywhere, Category = Animation)
+	int CharacterCurrentAmmo;
+
+	UPROPERTY(EditAnywhere, Category = Animation)
+	int CharacterMaxAmmo;
 };

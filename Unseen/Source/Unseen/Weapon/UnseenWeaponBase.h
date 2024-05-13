@@ -40,6 +40,14 @@ public:
 	UFUNCTION()
 	virtual void ShootWeapon();
 
+	UFUNCTION()
+	FORCEINLINE bool IsAmmoFull() const { return CurrentAmmo == MaxAmmo; }
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
 	float ShootRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
+	int MaxAmmo;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
+	int CurrentAmmo;
 };

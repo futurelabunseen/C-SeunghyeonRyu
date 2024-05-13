@@ -17,6 +17,7 @@ UGA_Step_Back::UGA_Step_Back()
 	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsRolling"));
 	ActivationOwnedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsStepBack"));
 	CancelAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("Character.Action.Aim"));
+	CancelAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("Character.Action.Reload"));
 }
 
 void UGA_Step_Back::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

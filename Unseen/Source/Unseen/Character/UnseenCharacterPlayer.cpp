@@ -110,6 +110,12 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 		ShootAction = InputActionShootRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionReloadRef(TEXT("/Script/EnhancedInput.InputAction'/Game/ThirdPerson/Input/Actions/IA_Reload.IA_Reload'"));
+	if (nullptr != InputActionReloadRef.Object)
+	{
+		ReloadAction = InputActionReloadRef.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> RollMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/AM_Roll_Rifle.AM_Roll_Rifle'"));
 	if (RollMontageRef.Succeeded())
 	{
@@ -126,6 +132,12 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	if (ShootingMontageRef.Succeeded())
 	{
 		ShootingMontage = ShootingMontageRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> ReloadMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/AM_Reload.AM_Reload'"));
+	if (ReloadMontageRef.Succeeded())
+	{
+		ReloadMontage = ReloadMontageRef.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> RifleMainBodyShootMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Weapon/AnimMontage/AM_Shooting_Automatic_Assault_Rifle.AM_Shooting_Automatic_Assault_Rifle'"));
@@ -168,6 +180,8 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 
 	AimCameraTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("AimCameraTimeline"));
 
+	CharacterMaxAmmo = 999;
+	CharacterCurrentAmmo = 150;
 }
 
 void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
@@ -265,14 +279,18 @@ void AUnseenCharacterPlayer::BeginPlay()
 		const auto NotifyEvents = RifleMainBodyShootMontage->Notifies;
 		for (FAnimNotifyEvent EventNotify : NotifyEvents)
 		{
-			if (const auto ShootingNotify = Cast<UAnimNotify_Shoot>(EventNotify.Notify))
+			if (const auto ShootStartNotify = Cast<UAnimNotify_Shoot>(EventNotify.Notify))
 			{
-				ShootingNotify->OnNotified.AddUObject(this, &AUnseenCharacterPlayer::ShootWeapon);
+				ShootStartNotify->OnNotified.AddUObject(this, &AUnseenCharacterPlayer::ShootWeapon);
 			}
 
-			if (const auto ShootingNotify = Cast<UAnimNotify_ShootEnd>(EventNotify.Notify))
+			if (const auto ShootEndNotify = Cast<UAnimNotify_ShootEnd>(EventNotify.Notify))
 			{
-				ShootingNotify->OnNotified.AddUObject(this, &AUnseenCharacterPlayer::ShootWeaponEnd);
+				ShootEndNotify->OnNotified.AddUObject(this, &AUnseenCharacterPlayer::ShootWeaponEnd);
+			}
+			if (const auto ReloadEndNotify = Cast<UAnimNotify_ReloadEnd>(EventNotify.Notify))
+			{
+				ReloadEndNotify->OnNotified.AddUObject(this, &AUnseenCharacterPlayer::ReloadMontageEnd);
 			}
 		}
 	}
@@ -376,6 +394,8 @@ void AUnseenCharacterPlayer::SetupGASInputComponent()
 
 		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 7);
 		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Completed, this, &AUnseenCharacterPlayer::GASInputReleased, 7);
+
+		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AUnseenCharacterPlayer::GASInputPressed, 8);
 		
 	}
 }
@@ -570,6 +590,11 @@ void AUnseenCharacterPlayer::ShootWeapon()
 {
 	UE_LOG(LogTemp, Warning, TEXT("WeaponStart Notify"));
 	GetWeaponOnHand()->ShootWeapon();
+
+	if (GetWeaponOnHand()->CurrentAmmo == 0)
+	{
+		ASC->CancelAbility(ASC->FindAbilitySpecFromInputID(7)->Ability);
+	}
 }
 
 void AUnseenCharacterPlayer::ShootWeaponEnd()
@@ -580,5 +605,20 @@ void AUnseenCharacterPlayer::ShootWeaponEnd()
 		GetMesh()->GetAnimInstance()->Montage_Stop(0.5f, ShootingMontage);
 		GetWeaponOnHand()->ShootingStop();
 	}
-	
+	// Todo : 지금 문제는 ShootWeaponEndNotify가 몽타주 맨 뒷 부분에 있다보니 Montage_Stop을 해도 애니메이션 맨 첫 부분에 있는 Start Notify가 울리는 거. 그래서 총을 한 발 더 쏨.
+}
+
+void AUnseenCharacterPlayer::ReloadMontageEnd()
+{
+	int LeftWeaponAmmo = GetWeaponOnHand()->CurrentAmmo;
+	int NeedAmmo = GetWeaponOnHand()->MaxAmmo - LeftWeaponAmmo;
+	int ReloadCnt = CharacterCurrentAmmo < NeedAmmo ? CharacterCurrentAmmo : NeedAmmo;
+	CharacterCurrentAmmo -= ReloadCnt;
+	GetWeaponOnHand()->CurrentAmmo += ReloadCnt;
+	ASC->CancelAbility(ASC->FindAbilitySpecFromInputID(8)->Ability);
+}
+
+bool AUnseenCharacterPlayer::IsCanReload()
+{
+	return (CharacterCurrentAmmo > 0 && !GetWeaponOnHand()->IsAmmoFull());
 }

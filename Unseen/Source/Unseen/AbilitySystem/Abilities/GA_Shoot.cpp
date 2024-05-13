@@ -37,6 +37,29 @@ void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 	}
 }
 
+bool UGA_Shoot::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
+{
+	if (!Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
+	{
+		return false;
+	}
+
+	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+	UAbilitySystemComponent* ASC = UnseenCharacter->GetAbilitySystemComponent();
+
+	if (UnseenCharacter->GetWeaponOnHand()->CurrentAmmo <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Ammo"));
+
+		//0발에 사격하면 재장전하게 하려고 했는데 차피 aim 중이라 안됨.
+		//ASC->TryActivateAbility(ASC->FindAbilitySpecFromInputID(8)->Handle);
+
+		return false;
+	}
+
+	return true;
+}
+
 void UGA_Shoot::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
