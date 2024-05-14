@@ -588,12 +588,15 @@ AUnseenWeaponBase* AUnseenCharacterPlayer::GetWeaponOnHand()
 
 void AUnseenCharacterPlayer::ShootWeapon()
 {
-	UE_LOG(LogTemp, Warning, TEXT("WeaponStart Notify"));
-	GetWeaponOnHand()->ShootWeapon();
-
-	if (GetWeaponOnHand()->CurrentAmmo == 0)
+	if (bIsShooting)
 	{
-		ASC->CancelAbility(ASC->FindAbilitySpecFromInputID(7)->Ability);
+		UE_LOG(LogTemp, Warning, TEXT("WeaponStart Notify"));
+		GetWeaponOnHand()->ShootWeapon();
+
+		if (GetWeaponOnHand()->CurrentAmmo == 0)
+		{
+			ASC->CancelAbility(ASC->FindAbilitySpecFromInputID(7)->Ability);
+		}
 	}
 }
 
@@ -605,7 +608,6 @@ void AUnseenCharacterPlayer::ShootWeaponEnd()
 		GetMesh()->GetAnimInstance()->Montage_Stop(0.5f, ShootingMontage);
 		GetWeaponOnHand()->ShootingStop();
 	}
-	// Todo : 지금 문제는 ShootWeaponEndNotify가 몽타주 맨 뒷 부분에 있다보니 Montage_Stop을 해도 애니메이션 맨 첫 부분에 있는 Start Notify가 울리는 거. 그래서 총을 한 발 더 쏨.
 }
 
 void AUnseenCharacterPlayer::ReloadMontageEnd()
