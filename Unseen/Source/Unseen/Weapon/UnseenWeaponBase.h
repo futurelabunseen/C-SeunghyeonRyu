@@ -50,4 +50,7 @@ public:
 	int MaxAmmo;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
 	int CurrentAmmo;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon Material")
+	void ChangeMaterialBulletVariable();
 };

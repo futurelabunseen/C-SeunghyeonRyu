@@ -87,6 +87,7 @@ AAssaultRifle::AAssaultRifle()
 	BulletSleeve->SetRelativeLocation(FVector(-25.77f, 0, 9.59f));
 
 	MaxAmmo = 30;
+
 }
 
 // Called when the game starts or when spawned
@@ -100,6 +101,7 @@ void AAssaultRifle::BeginPlay()
 
 	CurrentAmmo = MaxAmmo;
 	ShootRate = 2.0f;
+
 }
 
 // Called every frame
@@ -111,23 +113,31 @@ void AAssaultRifle::Tick(float DeltaTime)
 
 void AAssaultRifle::ShootingMontageStart()
 {
+	Super::ShootingMontageStart();
+
 	MainBodyAnimInstance->PlayShootMontage(EWeaponPart::MainBody);
 	BulletSleeveAnimInstance->PlayShootMontage(EWeaponPart::BulletSleeve);
 }
 
 void AAssaultRifle::ShootingStop()
 {
+	Super::ShootingStop();
+
 	MainBodyAnimInstance->StopShootMontage(EWeaponPart::MainBody);
 	BulletSleeveAnimInstance->StopShootMontage(EWeaponPart::BulletSleeve);
 }
 
 void AAssaultRifle::ShootWeapon()
 {
+	Super::ShootWeapon();
+
 	CurrentAmmo -= 1;
+	ChangeMaterialBulletVariable();
 	UE_LOG(LogTemp, Warning, TEXT("Current Ammo : %d"), CurrentAmmo);
 	
 	//รั น฿ป็ ทฮม๗
 
 	
 }
+
 

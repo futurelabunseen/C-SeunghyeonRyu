@@ -629,6 +629,7 @@ void AUnseenCharacterPlayer::ReloadMontageEnd()
 	int ReloadCnt = CharacterCurrentAmmo < NeedAmmo ? CharacterCurrentAmmo : NeedAmmo;
 	CharacterCurrentAmmo -= ReloadCnt;
 	GetWeaponOnHand()->CurrentAmmo += ReloadCnt;
+	GetWeaponOnHand()->ChangeMaterialBulletVariable();
 	ASC->CancelAbility(ASC->FindAbilitySpecFromInputID(8)->Ability);
 }
 

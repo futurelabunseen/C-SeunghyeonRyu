@@ -28,12 +28,12 @@ void AUnseenWeaponBase::Tick(float DeltaTime)
 
 void AUnseenWeaponBase::ShootingMontageStart()
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("ShootingMontageStart"));
 }
 
 void AUnseenWeaponBase::ShootingStop()
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("ShootingStop"));
 }
 
 void AUnseenWeaponBase::ShootWeapon()
