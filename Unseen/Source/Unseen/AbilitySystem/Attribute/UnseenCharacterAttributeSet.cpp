@@ -9,7 +9,7 @@ UUnseenCharacterAttributeSet::UUnseenCharacterAttributeSet() :
 	RollStaminaCost(-30.0f),
 	StepBackStaminaCost(-30.0f),
 	SprintStaminaCost(-1.0f),
-	ShootRate(2.0f)
+	ShootRate(1.0f)
 {
 	InitStamina(GetMaxStamina());
 }

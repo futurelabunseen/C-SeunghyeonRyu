@@ -11,6 +11,7 @@
 #include "Animation/AnimNotify_Shoot.h"
 #include "Animation/AnimNotify_ShootEnd.h"
 #include "Animation/AnimNotify_ReloadEnd.h"
+#include "AbilitySystem/Attribute/UnseenCharacterAttributeSet.h"
 #include "UnseenCharacterPlayer.generated.h"
 
 /**
@@ -275,4 +276,6 @@ protected:
 
 	UFUNCTION()
 	void ChangeShootRate(float ShootRate);
+
+	const UUnseenCharacterAttributeSet* AttributeSet;
 };

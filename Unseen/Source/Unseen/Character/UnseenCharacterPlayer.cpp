@@ -208,6 +208,7 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 		}
 
 		SetupGASInputComponent();
+		AttributeSet = ASC->GetSet<UUnseenCharacterAttributeSet>();
 	}
 	
 	APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
@@ -251,7 +252,7 @@ void AUnseenCharacterPlayer::BeginPlay()
 	}
 
 	//Test용
-	ChangeShootRate(2.0f);
+	ChangeShootRate(1.0f);
 
 	// Roll Movement Timeline
 	RollTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnRollMovementTimelineUpdated") });
@@ -638,6 +639,6 @@ bool AUnseenCharacterPlayer::IsCanReload()
 
 void AUnseenCharacterPlayer::ChangeShootRate(float ShootRate)
 {
+	ASC->SetNumericAttributeBase(AttributeSet->GetShootRateAttribute(), ShootRate);
 	GetWeaponOnHand()->ShootRate = ShootRate;
-	//effect만들어야함
 }
