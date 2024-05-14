@@ -47,6 +47,7 @@ void UWeaponAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UWeaponAnimInstance::PlayShootMontage(EWeaponPart part)
 {
+	UpdateShootRate();
 	switch (part)
 	{
 	case EWeaponPart::MainBody:

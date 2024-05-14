@@ -272,4 +272,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = Animation)
 	int CharacterMaxAmmo;
+
+	UFUNCTION()
+	void ChangeShootRate(float ShootRate);
 };

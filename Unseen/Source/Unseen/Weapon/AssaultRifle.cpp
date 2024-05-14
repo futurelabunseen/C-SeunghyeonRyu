@@ -99,6 +99,7 @@ void AAssaultRifle::BeginPlay()
 	BulletSleeveAnimInstance = CastChecked<UWeaponAnimInstance>(BulletSleeve->GetAnimInstance());
 
 	CurrentAmmo = MaxAmmo;
+	ShootRate = 2.0f;
 }
 
 // Called every frame

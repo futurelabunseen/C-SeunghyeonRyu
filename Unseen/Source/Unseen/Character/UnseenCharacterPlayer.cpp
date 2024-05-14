@@ -250,6 +250,9 @@ void AUnseenCharacterPlayer::BeginPlay()
 		}
 	}
 
+	//Test용
+	ChangeShootRate(2.0f);
+
 	// Roll Movement Timeline
 	RollTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnRollMovementTimelineUpdated") });
 	RollMovementTimeline->AddInterpFloat(RollMovementCurve, RollTimeLineInterpFunction);
@@ -288,6 +291,14 @@ void AUnseenCharacterPlayer::BeginPlay()
 			{
 				ShootEndNotify->OnNotified.AddUObject(this, &AUnseenCharacterPlayer::ShootWeaponEnd);
 			}
+		}
+	}
+
+	if (ReloadMontage)
+	{
+		const auto NotifyEvents = ReloadMontage->Notifies;
+		for (FAnimNotifyEvent EventNotify : NotifyEvents)
+		{
 			if (const auto ReloadEndNotify = Cast<UAnimNotify_ReloadEnd>(EventNotify.Notify))
 			{
 				ReloadEndNotify->OnNotified.AddUObject(this, &AUnseenCharacterPlayer::ReloadMontageEnd);
@@ -623,4 +634,10 @@ void AUnseenCharacterPlayer::ReloadMontageEnd()
 bool AUnseenCharacterPlayer::IsCanReload()
 {
 	return (CharacterCurrentAmmo > 0 && !GetWeaponOnHand()->IsAmmoFull());
+}
+
+void AUnseenCharacterPlayer::ChangeShootRate(float ShootRate)
+{
+	GetWeaponOnHand()->ShootRate = ShootRate;
+	//effect만들어야함
 }
