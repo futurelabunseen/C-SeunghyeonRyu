@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "UI/UnseenCharacterHUD.h"
+#include "Camera/PlayerCameraManager.h"
 #include "UnseenWeaponBase.generated.h"
 
 UENUM()

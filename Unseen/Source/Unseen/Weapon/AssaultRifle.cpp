@@ -88,11 +88,11 @@ AAssaultRifle::AAssaultRifle()
 
 	MaxAmmo = 30;
 
-	MaxVerticalRecoil = 5.0f;
+	MaxVerticalRecoil = 1.0f;
 	MaxHorizontalRecoil = 10.0f;
 	CurrentVerticalRecoil = MaxVerticalRecoil;
 	CurrentHorizontalRecoil = 0.0f;
-	HorizontalRecoilAmount = 2.0f;
+	HorizontalRecoilAmount = 1.0f;
 
 }
 
@@ -132,7 +132,7 @@ void AAssaultRifle::ShootingMontageStart()
 	Super::ShootingMontageStart();
 
 	MainBodyAnimInstance->PlayShootMontage(EWeaponPart::MainBody);
-	BulletSleeveAnimInstance->PlayShootMontage(EWeaponPart::BulletSleeve);
+	//BulletSleeveAnimInstance->PlayShootMontage(EWeaponPart::BulletSleeve);
 }
 
 void AAssaultRifle::ShootingStop()
@@ -140,7 +140,7 @@ void AAssaultRifle::ShootingStop()
 	Super::ShootingStop();
 
 	MainBodyAnimInstance->StopShootMontage(EWeaponPart::MainBody);
-	BulletSleeveAnimInstance->StopShootMontage(EWeaponPart::BulletSleeve);
+	//BulletSleeveAnimInstance->StopShootMontage(EWeaponPart::BulletSleeve);
 }
 
 void AAssaultRifle::ShootWeapon()
@@ -148,6 +148,8 @@ void AAssaultRifle::ShootWeapon()
 	Super::ShootWeapon();
 
 	CurrentAmmo -= 1;
+	GetWorld()->GetFirstPlayerController()->GetPawn()->AddControllerPitchInput(-CurrentVerticalRecoil);
+	GetWorld()->SpawnActor<ABullet_Sleeve>(ABullet_Sleeve::StaticClass(), MainBody->GetSocketLocation(FName("Sleeve")), MainBody->GetSocketRotation(FName("Sleeve")));
 	
 	float AmountHorizontalRecoil = MaxHorizontalRecoil - CurrentHorizontalRecoil < HorizontalRecoilAmount ? MaxHorizontalRecoil - CurrentHorizontalRecoil : HorizontalRecoilAmount;
 	CurrentHorizontalRecoil += AmountHorizontalRecoil;
