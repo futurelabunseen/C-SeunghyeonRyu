@@ -622,7 +622,7 @@ void AUnseenCharacterPlayer::ShootWeaponEnd()
 	UE_LOG(LogTemp, Warning, TEXT("WeaponEnd Notify"));
 	if (!bIsShooting)
 	{
-		GetMesh()->GetAnimInstance()->Montage_Stop(0.5f, ShootingMontage);
+		GetMesh()->GetAnimInstance()->Montage_Stop(0.1f, ShootingMontage);
 		GetWeaponOnHand()->ShootingStop();
 	}
 }
