@@ -188,6 +188,8 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 
 	CharacterMaxAmmo = 999;
 	CharacterCurrentAmmo = 150;
+
+	bApplyRecoil = true;
 }
 
 void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
@@ -616,7 +618,15 @@ void AUnseenCharacterPlayer::ShootWeapon()
 		UE_LOG(LogTemp, Warning, TEXT("WeaponStart Notify"));
 		
 		ShootProjectile();
-		GetWeaponOnHand()->ShootWeapon();
+		
+		if (bApplyRecoil)
+		{
+			GetWeaponOnHand()->ShootWeapon();
+		}
+		else
+		{
+			GetWeaponOnHand()->ShootWeaponNotHorizontalRecoil();
+		}
 
 		if (GetWeaponOnHand()->CurrentAmmo == 0)
 		{
@@ -669,16 +679,25 @@ void AUnseenCharacterPlayer::ShootProjectile()
 	FHitResult HitResult;
 	FCollisionQueryParams Params(FName("CameraTrace"),false, this);
 	APlayerCameraManager* PlayerCamera = CastChecked<APlayerController>(GetController())->PlayerCameraManager;
+	
+	// Todo : 너무 계산이 많아서 그런지 지금 가끔 이상하게 계산 됨.
+	float HorizontalRecoilRandomVar = GetWeaponOnHand()->CurrentHorizontalRecoil; // 일단 최대 recoil 값으로 테스트하면서 적당한 value값 찾기
+	//float HorizontalRecoilRandomVar = UKismetMathLibrary::RandomFloatInRange(-GetWeaponOnHand()->CurrentHorizontalRecoil, GetWeaponOnHand()->CurrentHorizontalRecoil);
+	
 	FVector Start = PlayerCamera->GetCameraLocation();
-	FVector End = PlayerCamera->GetCameraLocation() + PlayerCamera->GetActorForwardVector() * 5000.0f;
+	FVector End = PlayerCamera->GetCameraLocation() + (PlayerCamera->GetActorForwardVector() * 5000.0f);
 	bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 0.2f);
 
 	FVector SpawnLocation = GetWeaponOnHand()->GetMuzzlePos();
 	FRotator SpawnRotator;
 
 	if (HitDetected)
 	{
-		SpawnRotator = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, HitResult.ImpactPoint);
+		float ProportionalValue = HitResult.Distance * HorizontalRecoilRandomVar / 600.0f; // last float is experiential value
+		UE_LOG(LogTemp, Warning, TEXT("Distance : %f"), HitResult.Distance);
+		SpawnRotator = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, HitResult.ImpactPoint + (PlayerCamera->GetActorRightVector() * ProportionalValue));
+		DrawDebugLine(GetWorld(), SpawnLocation, HitResult.ImpactPoint + (PlayerCamera->GetActorRightVector() * ProportionalValue), FColor::Blue, true, 1.0f, 0, 0.2f);
 	}
 	else
 	{

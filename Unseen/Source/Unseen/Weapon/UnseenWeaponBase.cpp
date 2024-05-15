@@ -47,6 +47,10 @@ void AUnseenWeaponBase::ShootWeapon()
 	UE_LOG(LogTemp, Warning, TEXT("ShootWeapon"));
 }
 
+void AUnseenWeaponBase::ShootWeaponNotHorizontalRecoil()
+{
+}
+
 FVector AUnseenWeaponBase::GetMuzzlePos()
 {
 	return FVector();

@@ -30,6 +30,7 @@ public:
 	void ShootingMontageStart() override;
 	void ShootingStop() override;
 	void ShootWeapon() override;
+	void ShootWeaponNotHorizontalRecoil() override;
 	FVector GetMuzzlePos() override;
 
 protected:

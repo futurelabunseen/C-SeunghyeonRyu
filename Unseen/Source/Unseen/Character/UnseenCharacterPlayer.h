@@ -266,6 +266,9 @@ public:
 	UFUNCTION()
 	bool IsCanReload();
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Development)
+	uint8 bApplyRecoil : 1;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = Animation)
 	TObjectPtr<class UAnimMontage> RifleMainBodyShootMontage;
@@ -289,4 +292,5 @@ protected:
 
 	UFUNCTION()
 	void ShootProjectile();
+
 };

@@ -89,10 +89,10 @@ AAssaultRifle::AAssaultRifle()
 	MaxAmmo = 30;
 
 	MaxVerticalRecoil = 1.0f;
-	MaxHorizontalRecoil = 10.0f;
+	MaxHorizontalRecoil = 30.0f; // 10
 	CurrentVerticalRecoil = MaxVerticalRecoil;
 	CurrentHorizontalRecoil = 0.0f;
-	HorizontalRecoilAmount = 1.0f;
+	HorizontalRecoilAmount = 3.0f; // 1
 
 }
 
@@ -159,6 +159,19 @@ void AAssaultRifle::ShootWeapon()
 	//รั น฿ป็ ทฮม๗
 
 	
+}
+
+void AAssaultRifle::ShootWeaponNotHorizontalRecoil()
+{
+	Super::ShootWeaponNotHorizontalRecoil();
+
+	CurrentAmmo -= 1;
+	GetWorld()->SpawnActor<ABullet_Sleeve>(ABullet_Sleeve::StaticClass(), MainBody->GetSocketLocation(FName("Sleeve")), MainBody->GetSocketRotation(FName("Sleeve")));
+
+	float AmountHorizontalRecoil = MaxHorizontalRecoil - CurrentHorizontalRecoil < HorizontalRecoilAmount ? MaxHorizontalRecoil - CurrentHorizontalRecoil : HorizontalRecoilAmount;
+	CurrentHorizontalRecoil += AmountHorizontalRecoil;
+	ChangeMaterialBulletVariable();
+	UE_LOG(LogTemp, Warning, TEXT("Current Ammo : %d"), CurrentAmmo);
 }
 
 FVector AAssaultRifle::GetMuzzlePos()

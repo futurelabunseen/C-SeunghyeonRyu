@@ -42,6 +42,10 @@ public:
 	UFUNCTION()
 	virtual void ShootWeapon();
 
+	// for development
+	UFUNCTION()
+	virtual void ShootWeaponNotHorizontalRecoil();
+
 	UFUNCTION()
 	virtual FVector GetMuzzlePos();
 
