@@ -47,3 +47,8 @@ void AUnseenWeaponBase::ShootWeapon()
 	UE_LOG(LogTemp, Warning, TEXT("ShootWeapon"));
 }
 
+FVector AUnseenWeaponBase::GetMuzzlePos()
+{
+	return FVector();
+}
+

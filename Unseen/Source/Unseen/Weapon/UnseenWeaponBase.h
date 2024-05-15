@@ -43,6 +43,9 @@ public:
 	virtual void ShootWeapon();
 
 	UFUNCTION()
+	virtual FVector GetMuzzlePos();
+
+	UFUNCTION()
 	FORCEINLINE bool IsAmmoFull() const { return CurrentAmmo == MaxAmmo; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)

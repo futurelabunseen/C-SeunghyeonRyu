@@ -170,6 +170,12 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 		AimCameraCurve = AimCameraCurveRef.Object;
 	}
 
+	static ConstructorHelpers::FClassFinder<AActor> AssaultRifleProjectileBPClassRef(TEXT("/Script/Engine.Blueprint'/Game/Weapon/USBP_Projectile_AssaultRifle.USBP_Projectile_AssaultRifle_C'"));
+	if (AssaultRifleProjectileBPClassRef.Class)
+	{
+		AssaultRifleProjectileBPClass = AssaultRifleProjectileBPClassRef.Class;
+	}
+
 	RollMovementTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RollMovementTimeline"));
 	RollDistance = 400.f;
 
@@ -608,6 +614,8 @@ void AUnseenCharacterPlayer::ShootWeapon()
 	if (bIsShooting)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("WeaponStart Notify"));
+		
+		ShootProjectile();
 		GetWeaponOnHand()->ShootWeapon();
 
 		if (GetWeaponOnHand()->CurrentAmmo == 0)
@@ -654,4 +662,28 @@ void AUnseenCharacterPlayer::IncreaseShootRate(float ShootRate)
 	float CurrentValue = AttributeSet->GetShootRate();
 	ASC->SetNumericAttributeBase(AttributeSet->GetShootRateAttribute(), CurrentValue + ShootRate);
 	GetWeaponOnHand()->ShootRate = CurrentValue + ShootRate;
+}
+
+void AUnseenCharacterPlayer::ShootProjectile()
+{
+	FHitResult HitResult;
+	FCollisionQueryParams Params(FName("CameraTrace"),false, this);
+	APlayerCameraManager* PlayerCamera = CastChecked<APlayerController>(GetController())->PlayerCameraManager;
+	FVector Start = PlayerCamera->GetCameraLocation();
+	FVector End = PlayerCamera->GetCameraLocation() + PlayerCamera->GetActorForwardVector() * 5000.0f;
+	bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+	FVector SpawnLocation = GetWeaponOnHand()->GetMuzzlePos();
+	FRotator SpawnRotator;
+
+	if (HitDetected)
+	{
+		SpawnRotator = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, HitResult.ImpactPoint);
+	}
+	else
+	{
+		SpawnRotator = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, HitResult.TraceEnd);
+	}
+
+	GetWorld()->SpawnActor<AUS_Projectile_AssaultRifle>(AssaultRifleProjectileBPClass, SpawnLocation, SpawnRotator);
 }

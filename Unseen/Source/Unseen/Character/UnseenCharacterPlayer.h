@@ -11,6 +11,8 @@
 #include "Animation/AnimNotify_Shoot.h"
 #include "Animation/AnimNotify_ShootEnd.h"
 #include "Animation/AnimNotify_ReloadEnd.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Weapon/US_Projectile_AssaultRifle.h"
 #include "AbilitySystem/Attribute/UnseenCharacterAttributeSet.h"
 #include "UnseenCharacterPlayer.generated.h"
 
@@ -274,6 +276,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Animation)
 	int CharacterMaxAmmo;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AUS_Projectile_AssaultRifle> AssaultRifleProjectileBPClass;
+
 	UFUNCTION(BlueprintCallable)
 	void ChangeShootRate(float ShootRate);
 
@@ -281,4 +286,7 @@ protected:
 	void IncreaseShootRate(float ShootRate);
 
 	const UUnseenCharacterAttributeSet* AttributeSet;
+
+	UFUNCTION()
+	void ShootProjectile();
 };

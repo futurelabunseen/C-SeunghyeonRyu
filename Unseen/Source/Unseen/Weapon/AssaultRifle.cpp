@@ -161,4 +161,9 @@ void AAssaultRifle::ShootWeapon()
 	
 }
 
+FVector AAssaultRifle::GetMuzzlePos()
+{
+	return Silencer->GetSocketLocation(FName("Muzzle"));
+}
+
 

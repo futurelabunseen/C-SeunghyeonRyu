@@ -30,6 +30,7 @@ public:
 	void ShootingMontageStart() override;
 	void ShootingStop() override;
 	void ShootWeapon() override;
+	FVector GetMuzzlePos() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon Parts", meta = (AllowPrivateAccess = "true"))
