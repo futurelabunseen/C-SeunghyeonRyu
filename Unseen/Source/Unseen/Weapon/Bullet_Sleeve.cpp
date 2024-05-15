@@ -27,7 +27,7 @@ void ABullet_Sleeve::BeginPlay()
 {
 	Super::BeginPlay();
 	BulletSleeveMeshComponent->AddImpulse(FVector(0.0f, 80.0f, 0.0f), NAME_None, true);
-	SetLifeSpan(3.0f);
+	SetLifeSpan(5.0f);
 }
 
 // Called every frame

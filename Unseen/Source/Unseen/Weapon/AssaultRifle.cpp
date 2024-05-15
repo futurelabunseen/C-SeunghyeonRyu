@@ -146,7 +146,7 @@ void AAssaultRifle::ShootingStop()
 void AAssaultRifle::ShootWeapon()
 {
 	Super::ShootWeapon();
-
+	
 	CurrentAmmo -= 1;
 	GetWorld()->GetFirstPlayerController()->GetPawn()->AddControllerPitchInput(-CurrentVerticalRecoil);
 	GetWorld()->SpawnActor<ABullet_Sleeve>(ABullet_Sleeve::StaticClass(), MainBody->GetSocketLocation(FName("Sleeve")), MainBody->GetSocketRotation(FName("Sleeve")));
