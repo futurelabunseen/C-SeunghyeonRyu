@@ -26,7 +26,10 @@ ABullet_Sleeve::ABullet_Sleeve()
 void ABullet_Sleeve::BeginPlay()
 {
 	Super::BeginPlay();
-	BulletSleeveMeshComponent->AddImpulse(FVector(0.0f, 80.0f, 0.0f), NAME_None, true);
+
+	FVector temp = GetActorTransform().TransformVector(FVector(0.0f, -80.0f, 0.0f));
+	BulletSleeveMeshComponent->AddImpulse(temp, NAME_None, true);
+	//BulletSleeveMeshComponent->AddImpulse(FVector(0.0f, 80.0f, 0.0f), NAME_None, true);
 	SetLifeSpan(5.0f);
 }
 
