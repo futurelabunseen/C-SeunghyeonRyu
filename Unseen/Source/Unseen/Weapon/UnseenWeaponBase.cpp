@@ -10,6 +10,12 @@ AUnseenWeaponBase::AUnseenWeaponBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ShootRate = 1.0f;
+	MaxVerticalRecoil = 1.0f;
+	MaxHorizontalRecoil = 1.0f;
+	CurrentVerticalRecoil = MaxVerticalRecoil;
+	CurrentHorizontalRecoil = 0.0f;
+	HorizontalRecoilAmount = 0.0f;
+	bIsOnHand = false;
 }
 
 // Called when the game starts or when spawned

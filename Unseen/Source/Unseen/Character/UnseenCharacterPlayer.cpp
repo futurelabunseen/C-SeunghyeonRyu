@@ -248,6 +248,11 @@ void AUnseenCharacterPlayer::BeginPlay()
 		{
 			AssaultRifle->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("RH_Rifle"));
 			WeaponOnHand = AssaultRifle;
+			WeaponOnHand->bIsOnHand = true;
+			if (PlayerHUD)
+			{
+				WeaponOnHand->OwnerPlayerHUD = PlayerHUD;
+			}
 		}
 	}
 
@@ -642,4 +647,11 @@ void AUnseenCharacterPlayer::ChangeShootRate(float ShootRate)
 {
 	ASC->SetNumericAttributeBase(AttributeSet->GetShootRateAttribute(), ShootRate);
 	GetWeaponOnHand()->ShootRate = ShootRate;
+}
+
+void AUnseenCharacterPlayer::IncreaseShootRate(float ShootRate)
+{
+	float CurrentValue = AttributeSet->GetShootRate();
+	ASC->SetNumericAttributeBase(AttributeSet->GetShootRateAttribute(), CurrentValue + ShootRate);
+	GetWeaponOnHand()->ShootRate = CurrentValue + ShootRate;
 }

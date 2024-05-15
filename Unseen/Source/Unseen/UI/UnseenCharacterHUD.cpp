@@ -35,11 +35,23 @@ void UUnseenCharacterHUD::SetCrossHairPos()
 	}
 	if (CrossHairTop)
 	{
-		UWidgetLayoutLibrary::SlotAsCanvasSlot(CrossHairTop)->SetPosition(FVector2D(- CrossHairShortLength / 2, - CrossHairLongLength - 4));
+		UWidgetLayoutLibrary::SlotAsCanvasSlot(CrossHairTop)->SetPosition(FVector2D(- CrossHairShortLength / 2, - CrossHairLongLength / 2 - 4));
 	}
 	if (CrossHairBottom)
 	{
 		UWidgetLayoutLibrary::SlotAsCanvasSlot(CrossHairBottom)->SetPosition(FVector2D(- CrossHairShortLength / 2, 4));
+	}
+}
+
+void UUnseenCharacterHUD::SetHorizontalCrossHairPos(float HorizontalRecoil)
+{
+	if (CrossHairLeft)
+	{
+		UWidgetLayoutLibrary::SlotAsCanvasSlot(CrossHairLeft)->SetPosition(FVector2D(-CrossHairLongLength - 4 - HorizontalRecoil, -CrossHairShortLength / 2));
+	}
+	if (CrossHairRight)
+	{
+		UWidgetLayoutLibrary::SlotAsCanvasSlot(CrossHairRight)->SetPosition(FVector2D(4 + HorizontalRecoil, -CrossHairShortLength / 2));
 	}
 }
 
@@ -68,13 +80,13 @@ void UUnseenCharacterHUD::NativeOnInitialized()
 	if (CrossHairTop)
 	{
 		CrossHairTop->SetColorAndOpacity(FLinearColor{ 1.0f, 0, 0, 1.0f });
-		UWidgetLayoutLibrary::SlotAsCanvasSlot(CrossHairTop)->SetSize(FVector2D(CrossHairShortLength, CrossHairLongLength));
+		UWidgetLayoutLibrary::SlotAsCanvasSlot(CrossHairTop)->SetSize(FVector2D(CrossHairShortLength, CrossHairLongLength / 2));
 		UWidgetLayoutLibrary::SlotAsCanvasSlot(CrossHairTop)->SetAnchors(0.5f);
 	}
 	if (CrossHairBottom)
 	{
 		CrossHairBottom->SetColorAndOpacity(FLinearColor{ 1.0f, 0, 0, 1.0f });
-		UWidgetLayoutLibrary::SlotAsCanvasSlot(CrossHairBottom)->SetSize(FVector2D(CrossHairShortLength, CrossHairLongLength));
+		UWidgetLayoutLibrary::SlotAsCanvasSlot(CrossHairBottom)->SetSize(FVector2D(CrossHairShortLength, CrossHairLongLength / 2));
 		UWidgetLayoutLibrary::SlotAsCanvasSlot(CrossHairBottom)->SetAnchors(0.5f);
 	}
 

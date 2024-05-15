@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "UI/UnseenCharacterHUD.h"
 #include "UnseenWeaponBase.generated.h"
 
 UENUM()
@@ -53,4 +54,25 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon Material")
 	void ChangeMaterialBulletVariable();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
+	float MaxVerticalRecoil;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
+	float MaxHorizontalRecoil;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
+	float CurrentHorizontalRecoil;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
+	float CurrentVerticalRecoil;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
+	float HorizontalRecoilAmount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
+	TObjectPtr<class UUnseenCharacterHUD> OwnerPlayerHUD;
+
+	UPROPERTY()
+	uint8 bIsOnHand : 1;
 };

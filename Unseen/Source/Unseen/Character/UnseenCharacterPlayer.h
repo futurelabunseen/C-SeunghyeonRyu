@@ -274,8 +274,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Animation)
 	int CharacterMaxAmmo;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ChangeShootRate(float ShootRate);
+
+	UFUNCTION(BlueprintCallable)
+	void IncreaseShootRate(float ShootRate);
 
 	const UUnseenCharacterAttributeSet* AttributeSet;
 };

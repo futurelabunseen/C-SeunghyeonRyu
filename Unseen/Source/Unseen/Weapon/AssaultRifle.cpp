@@ -88,6 +88,12 @@ AAssaultRifle::AAssaultRifle()
 
 	MaxAmmo = 30;
 
+	MaxVerticalRecoil = 5.0f;
+	MaxHorizontalRecoil = 10.0f;
+	CurrentVerticalRecoil = MaxVerticalRecoil;
+	CurrentHorizontalRecoil = 0.0f;
+	HorizontalRecoilAmount = 2.0f;
+
 }
 
 // Called when the game starts or when spawned
@@ -109,6 +115,16 @@ void AAssaultRifle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
+	if (bIsOnHand)
+	{
+		if (CurrentHorizontalRecoil > 0.0f)
+		{
+			CurrentHorizontalRecoil = FMath::FInterpTo(CurrentHorizontalRecoil, 0.0f, DeltaTime, 0.5f);
+			OwnerPlayerHUD->SetHorizontalCrossHairPos(CurrentHorizontalRecoil);
+		}
+	}
+	
+
 }
 
 void AAssaultRifle::ShootingMontageStart()
@@ -132,6 +148,9 @@ void AAssaultRifle::ShootWeapon()
 	Super::ShootWeapon();
 
 	CurrentAmmo -= 1;
+	
+	float AmountHorizontalRecoil = MaxHorizontalRecoil - CurrentHorizontalRecoil < HorizontalRecoilAmount ? MaxHorizontalRecoil - CurrentHorizontalRecoil : HorizontalRecoilAmount;
+	CurrentHorizontalRecoil += AmountHorizontalRecoil;
 	ChangeMaterialBulletVariable();
 	UE_LOG(LogTemp, Warning, TEXT("Current Ammo : %d"), CurrentAmmo);
 	

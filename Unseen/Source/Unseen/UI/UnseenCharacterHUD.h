@@ -42,6 +42,7 @@ public:
 
 	UFUNCTION()
 	void SetCrossHairPos();
+	void SetHorizontalCrossHairPos(float HorizontalRecoil);
 
 protected:
 	virtual void NativeOnInitialized();
