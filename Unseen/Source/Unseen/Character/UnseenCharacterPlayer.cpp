@@ -190,6 +190,8 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	CharacterCurrentAmmo = 150;
 
 	bApplyRecoil = true;
+
+	tempVal = 600.0f;
 }
 
 void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
@@ -219,8 +221,8 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 		AttributeSet = ASC->GetSet<UUnseenCharacterAttributeSet>();
 	}
 	
-	APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
-	PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
+	//APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
+	//PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 
 	const UGameplayEffect* RegenStaminaEffectCDO = RegenStaminaEffect->GetDefaultObject<UGameplayEffect>();
 	ASC->ApplyGameplayEffectToSelf(RegenStaminaEffectCDO, 0, ASC->MakeEffectContext());
@@ -678,30 +680,36 @@ void AUnseenCharacterPlayer::ShootProjectile()
 {
 	FHitResult HitResult;
 	FCollisionQueryParams Params(FName("CameraTrace"),false, this);
+
+	// 라인 트레이싱 채널에 추가하는 방법 찾아보기
 	APlayerCameraManager* PlayerCamera = CastChecked<APlayerController>(GetController())->PlayerCameraManager;
 	
-	// Todo : 너무 계산이 많아서 그런지 지금 가끔 이상하게 계산 됨.
-	float HorizontalRecoilRandomVar = GetWeaponOnHand()->CurrentHorizontalRecoil; // 일단 최대 recoil 값으로 테스트하면서 적당한 value값 찾기
-	//float HorizontalRecoilRandomVar = UKismetMathLibrary::RandomFloatInRange(-GetWeaponOnHand()->CurrentHorizontalRecoil, GetWeaponOnHand()->CurrentHorizontalRecoil);
+	// Todo : 가끔 Distance가 튐. 유령이 있나?!!!!! 날아가는 총알에 hit했나? 정답
+	//float HorizontalRecoilRandomVar = GetWeaponOnHand()->CurrentHorizontalRecoil; // 일단 최대 recoil 값으로 테스트하면서 적당한 value값 찾기
+	float HorizontalRecoilRandomVar = UKismetMathLibrary::RandomFloatInRange(-GetWeaponOnHand()->CurrentHorizontalRecoil, GetWeaponOnHand()->CurrentHorizontalRecoil);
 	
 	FVector Start = PlayerCamera->GetCameraLocation();
-	FVector End = PlayerCamera->GetCameraLocation() + (PlayerCamera->GetActorForwardVector() * 5000.0f);
+	FVector End = PlayerCamera->GetCameraLocation() + (PlayerCamera->GetActorForwardVector() * 10000.0f);
 	bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
-	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 0.2f);
+	//DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 0.2f);
 
 	FVector SpawnLocation = GetWeaponOnHand()->GetMuzzlePos();
 	FRotator SpawnRotator;
 
 	if (HitDetected)
 	{
-		float ProportionalValue = HitResult.Distance * HorizontalRecoilRandomVar / 600.0f; // last float is experiential value
+		float ProportionalValue = HitResult.Distance * HorizontalRecoilRandomVar / tempVal; // tempVal is experiential value 600.0f is best
 		UE_LOG(LogTemp, Warning, TEXT("Distance : %f"), HitResult.Distance);
-		SpawnRotator = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, HitResult.ImpactPoint + (PlayerCamera->GetActorRightVector() * ProportionalValue));
-		DrawDebugLine(GetWorld(), SpawnLocation, HitResult.ImpactPoint + (PlayerCamera->GetActorRightVector() * ProportionalValue), FColor::Blue, true, 1.0f, 0, 0.2f);
+		FVector ProportionalVector = PlayerCamera->GetActorRightVector() * ProportionalValue;
+		SpawnRotator = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, HitResult.ImpactPoint + ProportionalVector);
+		//DrawDebugLine(GetWorld(), SpawnLocation, HitResult.ImpactPoint + ProportionalVector, FColor::Blue, true, 1.0f, 0, 0.2f);
 	}
 	else
 	{
-		SpawnRotator = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, HitResult.TraceEnd);
+		float ProportionalValue = 10000.0f * HorizontalRecoilRandomVar / tempVal;
+		FVector ProportionalVector = PlayerCamera->GetActorRightVector() * ProportionalValue;
+		SpawnRotator = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, HitResult.TraceEnd + ProportionalVector);
+		//DrawDebugLine(GetWorld(), SpawnLocation, HitResult.TraceEnd + ProportionalVector, FColor::Green, true, 1.0f, 0, 0.2f);
 	}
 
 	GetWorld()->SpawnActor<AUS_Projectile_AssaultRifle>(AssaultRifleProjectileBPClass, SpawnLocation, SpawnRotator);

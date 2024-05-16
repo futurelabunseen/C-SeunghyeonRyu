@@ -89,10 +89,10 @@ AAssaultRifle::AAssaultRifle()
 	MaxAmmo = 30;
 
 	MaxVerticalRecoil = 1.0f;
-	MaxHorizontalRecoil = 30.0f; // 10
+	MaxHorizontalRecoil = 20.0f; // 10
 	CurrentVerticalRecoil = MaxVerticalRecoil;
 	CurrentHorizontalRecoil = 0.0f;
-	HorizontalRecoilAmount = 3.0f; // 1
+	HorizontalRecoilAmount = 2.0f; // 1
 
 }
 

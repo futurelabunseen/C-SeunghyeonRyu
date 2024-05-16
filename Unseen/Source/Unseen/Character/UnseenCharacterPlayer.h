@@ -293,4 +293,7 @@ protected:
 	UFUNCTION()
 	void ShootProjectile();
 
+	UPROPERTY(EditAnywhere, Category = temp)
+	float tempVal;
+
 };
