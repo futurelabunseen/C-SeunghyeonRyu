@@ -249,7 +249,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<class AAssaultRifle> AssaultRifle;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<class AUnseenWeaponBase> WeaponOnHand;
 
 	UFUNCTION()
@@ -269,12 +269,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Development)
 	uint8 bApplyRecoil : 1;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Animation)
+	int CharacterCurrentAmmo;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = Animation)
 	TObjectPtr<class UAnimMontage> RifleMainBodyShootMontage;
-
-	UPROPERTY(EditAnywhere, Category = Animation)
-	int CharacterCurrentAmmo;
 
 	UPROPERTY(EditAnywhere, Category = Animation)
 	int CharacterMaxAmmo;
