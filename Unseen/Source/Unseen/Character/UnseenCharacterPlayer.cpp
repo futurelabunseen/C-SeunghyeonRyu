@@ -681,10 +681,8 @@ void AUnseenCharacterPlayer::ShootProjectile()
 	FHitResult HitResult;
 	FCollisionQueryParams Params(FName("CameraTrace"),false, this);
 
-	// 라인 트레이싱 채널에 추가하는 방법 찾아보기
 	APlayerCameraManager* PlayerCamera = CastChecked<APlayerController>(GetController())->PlayerCameraManager;
 	
-	// Todo : 가끔 Distance가 튐. 유령이 있나?!!!!! 날아가는 총알에 hit했나? 정답
 	//float HorizontalRecoilRandomVar = GetWeaponOnHand()->CurrentHorizontalRecoil; // 일단 최대 recoil 값으로 테스트하면서 적당한 value값 찾기
 	float HorizontalRecoilRandomVar = UKismetMathLibrary::RandomFloatInRange(-GetWeaponOnHand()->CurrentHorizontalRecoil, GetWeaponOnHand()->CurrentHorizontalRecoil);
 	

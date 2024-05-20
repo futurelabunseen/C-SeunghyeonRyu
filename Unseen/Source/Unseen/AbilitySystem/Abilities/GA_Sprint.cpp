@@ -25,6 +25,7 @@ void UGA_Sprint::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+	UnseenCharacter->bUseControllerRotationYaw = true;
 	UnseenCharacter->bIsSprinting = true;
 	UnseenCharacter->StopRegenStamina();
 	
@@ -70,6 +71,7 @@ void UGA_Sprint::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 
 	UnseenCharacter->StartRegenStaminaWithDelay(2.0f);
+	//UnseenCharacter->bUseControllerRotationYaw = false;
 	UnseenCharacter->bIsSprinting = false;
 
 	UnseenCharacter->GetCharacterMovement()->MaxWalkSpeed = 300.f;
