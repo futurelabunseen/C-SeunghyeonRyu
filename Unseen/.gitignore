@@ -72,3 +72,10 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Paid Assets
+Content/Sci-Fi_Assault_Rifle
+Content/MagicSpells
+Content/Vefects
+Content/Ancient_Golem
+
