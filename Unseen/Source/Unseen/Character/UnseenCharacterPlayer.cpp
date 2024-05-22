@@ -710,5 +710,16 @@ void AUnseenCharacterPlayer::ShootProjectile()
 		//DrawDebugLine(GetWorld(), SpawnLocation, HitResult.TraceEnd + ProportionalVector, FColor::Green, true, 1.0f, 0, 0.2f);
 	}
 
-	GetWorld()->SpawnActor<AUS_Projectile_AssaultRifle>(AssaultRifleProjectileBPClass, SpawnLocation, SpawnRotator);
+	// Todo : Object Polling ±¸Çö
+	if (GetWeaponOnHand()->ProjectilePool != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Projectile pool : %d"), GetWeaponOnHand()->ProjectilePool->Pool.Num());
+		AUS_ProjectileBase* Bullet = GetWeaponOnHand()->ProjectilePool->PullProjectile();
+		Bullet->SetActorLocation(SpawnLocation);
+		Bullet->SetActorRotation(SpawnRotator);
+		Bullet->SetProjectileActive(true);
+		Bullet->SetLifeSpanToPool();
+	}
+
+	//GetWorld()->SpawnActor<AUS_Projectile_AssaultRifle>(AssaultRifleProjectileBPClass, SpawnLocation, SpawnRotator);
 }

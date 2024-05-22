@@ -16,6 +16,8 @@ AUnseenWeaponBase::AUnseenWeaponBase()
 	CurrentHorizontalRecoil = 0.0f;
 	HorizontalRecoilAmount = 0.0f;
 	bIsOnHand = false;
+
+	ProjectilePool = nullptr;
 }
 
 // Called when the game starts or when spawned

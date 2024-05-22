@@ -7,6 +7,7 @@
 #include "Animation/WeaponAnimInstance.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Weapon/Bullet_Sleeve.h"
+#include "Weapon/PoolComponent_AssaultRifle.h"
 #include "AssaultRifle.generated.h"
 
 UCLASS()
@@ -72,5 +73,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim Instance", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UWeaponAnimInstance> BulletSleeveAnimInstance;
 
-
+	/*UPROPERTY()
+	TObjectPtr<class UPoolComponent_AssaultRifle> ProjectilePool;*/
 };

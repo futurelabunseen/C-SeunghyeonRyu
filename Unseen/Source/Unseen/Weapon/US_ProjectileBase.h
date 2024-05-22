@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Engine/Classes/GameFramework/ProjectileMovementComponent.h"
 #include "US_ProjectileBase.generated.h"
 
 UCLASS()
@@ -23,4 +24,24 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	void SetProjectileActive(bool IsActive);
+
+	UFUNCTION()
+	void PushPoolSelf();
+
+	UPROPERTY()
+	TObjectPtr<class UProjectilePoolComponent_Base> ProjectilePool;
+
+	UPROPERTY()
+	FTimerHandle TimerHandle_LifeSpanToPoolExpired;
+
+	UFUNCTION()
+	void SetLifeSpanToPool();
+
+	UPROPERTY()
+	float LifeSpanTime;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class UProjectileMovementComponent> ProjectileMovementComp;
 };

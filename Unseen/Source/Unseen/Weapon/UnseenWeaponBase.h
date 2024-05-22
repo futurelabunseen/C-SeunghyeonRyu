@@ -83,4 +83,7 @@ public:
 
 	UPROPERTY()
 	uint8 bIsOnHand : 1;
+
+	UPROPERTY()
+	TObjectPtr<class UProjectilePoolComponent_Base> ProjectilePool;
 };

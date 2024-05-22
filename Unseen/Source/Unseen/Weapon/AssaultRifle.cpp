@@ -94,6 +94,8 @@ AAssaultRifle::AAssaultRifle()
 	CurrentHorizontalRecoil = 0.0f;
 	HorizontalRecoilAmount = 2.0f; // 1
 
+	ProjectilePool = CreateDefaultSubobject<UPoolComponent_AssaultRifle>(TEXT("ProjectilePool"));
+
 }
 
 // Called when the game starts or when spawned

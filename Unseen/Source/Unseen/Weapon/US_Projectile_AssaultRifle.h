@@ -13,5 +13,22 @@ UCLASS()
 class UNSEEN_API AUS_Projectile_AssaultRifle : public AUS_ProjectileBase
 {
 	GENERATED_BODY()
+
+public:
+	AUS_Projectile_AssaultRifle();
 	
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class USphereComponent> SphereComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class UStaticMeshComponent> MeshComp;
+
+	
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };
