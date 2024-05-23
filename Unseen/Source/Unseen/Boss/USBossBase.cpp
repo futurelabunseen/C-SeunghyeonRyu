@@ -2,6 +2,7 @@
 
 
 #include "Boss/USBossBase.h"
+#include "UI/BossFightHUD.h"
 
 // Sets default values
 AUSBossBase::AUSBossBase()
@@ -10,6 +11,12 @@ AUSBossBase::AUSBossBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	bIsBattleStart = false;
+	MaxHp = 0;
+	CurrentHp = MaxHp;
+	BossFightHUDClass = nullptr;
+	BossFightHUD = nullptr;
+	BattleZoneBPClass = nullptr;
+	BattleZone = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -50,5 +57,50 @@ void AUSBossBase::LimitBattleZone()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Create Battle Zone"));
 	// 벽 동그랗게 만들어둔 액터 스폰
+	if (BossFightHUDClass)
+	{
+		BossFightHUD = CreateWidget<UBossFightHUD>(GetWorld()->GetFirstPlayerController(), BossFightHUDClass);
+		if (nullptr != BossFightHUD)
+		{
+			BossFightHUD->SetHealthBar(CurrentHp, MaxHp);
+			BossFightHUD->AddToPlayerScreen();
+		}
+	}
+}
+
+float AUSBossBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (bIsBattleStart)
+	{
+		if (CurrentHp <= DamageAmount)
+		{
+			CurrentHp = 0;
+			UE_LOG(LogTemp, Warning, TEXT("Boss Die"));
+			
+			if (BossFightHUD)
+			{
+				BossFightHUD->RemoveFromParent();
+				BossFightHUD = nullptr;
+			}
+			if (BattleZone)
+			{
+				BattleZone->Destroy();
+			}
+			Destroy();
+		}
+		else
+		{
+			CurrentHp -= DamageAmount;
+			UE_LOG(LogTemp, Warning, TEXT("Boss Hp : %d"), CurrentHp);
+		}
+
+		if (BossFightHUD)
+		{
+			BossFightHUD->SetHealthBar(CurrentHp, MaxHp);
+		}
+
+		return DamageAmount;
+	}
+	return 0.0f;
 }
 

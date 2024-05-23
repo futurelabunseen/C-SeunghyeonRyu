@@ -26,6 +26,6 @@ public:
 
 	void LimitBattleZone() override;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AActor> BattleZoneBPClass;
+
+
 };

@@ -715,6 +715,7 @@ void AUnseenCharacterPlayer::ShootProjectile()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Projectile pool : %d"), GetWeaponOnHand()->ProjectilePool->Pool.Num());
 		AUS_ProjectileBase* Bullet = GetWeaponOnHand()->ProjectilePool->PullProjectile();
+		// 데미지 강화 Bullet->CurrentDamage = Bullet->BaseDamage + DamageIncrease;
 		Bullet->SetActorLocation(SpawnLocation);
 		Bullet->SetActorRotation(SpawnRotator);
 		Bullet->SetProjectileActive(true);

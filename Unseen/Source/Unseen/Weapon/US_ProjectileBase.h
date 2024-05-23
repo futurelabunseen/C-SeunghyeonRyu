@@ -21,9 +21,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	UFUNCTION()
 	void SetProjectileActive(bool IsActive);
 
@@ -50,4 +47,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UStaticMeshComponent> MeshComp;
+
+	UPROPERTY()
+	int CurrentDamage;
+
+	UPROPERTY()
+	int BaseDamage;
 };

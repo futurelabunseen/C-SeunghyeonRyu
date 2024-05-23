@@ -2,6 +2,7 @@
 
 
 #include "Boss/USEarthBoss.h"
+#include "Blueprint/UserWidget.h"
 
 AUSEarthBoss::AUSEarthBoss()
 {
@@ -10,6 +11,15 @@ AUSEarthBoss::AUSEarthBoss()
 	{
 		BattleZoneBPClass = BattleZoneBPClassRef.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> BossFightHUDClassRef(TEXT("/Game/UI/WBP_BossFight.WBP_BossFight_C"));
+	if (BossFightHUDClassRef.Class)
+	{
+		BossFightHUDClass = BossFightHUDClassRef.Class;
+	}
+
+	MaxHp = 10000;
+	CurrentHp = MaxHp;
 }
 
 void AUSEarthBoss::BeginPlay()
@@ -28,5 +38,8 @@ void AUSEarthBoss::LimitBattleZone()
 {
 	Super::LimitBattleZone();
 
-	GetWorld()->SpawnActor<AActor>(BattleZoneBPClass, GetActorLocation(), FRotator::ZeroRotator);
+	BattleZone = GetWorld()->SpawnActor<AActor>(BattleZoneBPClass, GetActorLocation(), FRotator::ZeroRotator);
+
+	// ui ¶ç¿ì±â
 }
+

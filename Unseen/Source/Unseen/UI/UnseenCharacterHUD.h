@@ -21,6 +21,7 @@ class UNSEEN_API UUnseenCharacterHUD : public UUserWidget
 public:
 	UUnseenCharacterHUD(const FObjectInitializer& ObjectInitializer);
 
+	UFUNCTION(BlueprintCallable)
 	void SetStaminaBar(float CurrentStamina, float MaxStamina);
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))

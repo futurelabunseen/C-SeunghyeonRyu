@@ -31,4 +31,25 @@ public:
 
 	UFUNCTION()
 	virtual void LimitBattleZone();
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = State)
+	int MaxHp;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = State)
+	int CurrentHp;
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UBossFightHUD> BossFightHUDClass;
+
+	UPROPERTY()
+	TObjectPtr<class UBossFightHUD> BossFightHUD;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AActor> BattleZoneBPClass;
+
+	UPROPERTY()
+	TObjectPtr<class AActor> BattleZone;
+	
 };

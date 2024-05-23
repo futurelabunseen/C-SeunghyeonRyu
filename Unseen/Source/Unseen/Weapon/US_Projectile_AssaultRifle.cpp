@@ -4,6 +4,8 @@
 #include "Weapon/US_Projectile_AssaultRifle.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Boss/USBossBase.h"
 
 AUS_Projectile_AssaultRifle::AUS_Projectile_AssaultRifle()
 {
@@ -26,6 +28,10 @@ AUS_Projectile_AssaultRifle::AUS_Projectile_AssaultRifle()
 	ProjectileMovementComp->ProjectileGravityScale = 0.0f;
 
 	SphereComp->OnComponentHit.AddDynamic(this, &AUS_Projectile_AssaultRifle::OnHit);
+
+
+	BaseDamage = 100;
+	CurrentDamage = BaseDamage;
 }
 
 void AUS_Projectile_AssaultRifle::BeginPlay()
@@ -37,6 +43,8 @@ void AUS_Projectile_AssaultRifle::BeginPlay()
 void AUS_Projectile_AssaultRifle::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Todo 面倒 单固瘤 贸府
+
+	UGameplayStatics::ApplyDamage(OtherActor, CurrentDamage, nullptr, this, DamageType);
 
 	UE_LOG(LogTemp, Warning, TEXT("Bullet Hit %s"), *OtherActor->GetName());
 
