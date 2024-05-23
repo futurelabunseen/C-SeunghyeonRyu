@@ -12,7 +12,8 @@ AUS_ProjectileBase::AUS_ProjectileBase()
 
 	ProjectilePool = nullptr;
 	LifeSpanTime = 0.0f;
-
+	SphereComp = nullptr;
+	MeshComp = nullptr;
 	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComp");
 }
 
@@ -35,6 +36,7 @@ void AUS_ProjectileBase::SetProjectileActive(bool IsActive)
 	SetActorHiddenInGame(!IsActive);
 	SetActorEnableCollision(IsActive);
 	SetActorTickEnabled(IsActive);
+	
 
 	if (!IsActive)
 	{
@@ -42,6 +44,7 @@ void AUS_ProjectileBase::SetProjectileActive(bool IsActive)
 	}
 	else
 	{
+		ProjectileMovementComp->SetUpdatedComponent(RootComponent);
 		ProjectileMovementComp->Velocity = GetActorForwardVector() * 7000.0f;
 	}
 }

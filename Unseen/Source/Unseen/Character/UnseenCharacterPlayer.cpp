@@ -719,6 +719,17 @@ void AUnseenCharacterPlayer::ShootProjectile()
 		Bullet->SetActorRotation(SpawnRotator);
 		Bullet->SetProjectileActive(true);
 		Bullet->SetLifeSpanToPool();
+		if (Bullet->ProjectileMovementComp->UpdatedComponent)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("oooooooooooo"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("xxxxxxxxxxxxxxx"));
+		}
+		UE_LOG(LogTemp, Warning, TEXT("IsActive : %d"), Bullet->ProjectileMovementComp->IsActive());
+		//UE_LOG(LogTemp, Warning, TEXT("IsSimulatingPhysics : %d"), Bullet->ProjectileMovementComp->UpdatedComponent->IsSimulatingPhysics());
+
 	}
 
 	//GetWorld()->SpawnActor<AUS_Projectile_AssaultRifle>(AssaultRifleProjectileBPClass, SpawnLocation, SpawnRotator);

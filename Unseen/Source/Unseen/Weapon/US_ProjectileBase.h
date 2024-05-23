@@ -44,4 +44,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UProjectileMovementComponent> ProjectileMovementComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class USphereComponent> SphereComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class UStaticMeshComponent> MeshComp;
 };
