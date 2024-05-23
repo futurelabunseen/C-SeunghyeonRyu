@@ -12,10 +12,10 @@ UGA_Aim::UGA_Aim()
 	ActivationOwnedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsAiming"));
 
 	CancelAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("Character.Action.Sprint"));
-	CancelAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("Character.Action.Reload"));
 
 	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsRolling"));
 	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsStepBack"));
+	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsReloading"));
 	
 }
 

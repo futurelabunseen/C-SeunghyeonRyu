@@ -73,6 +73,4 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim Instance", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UWeaponAnimInstance> BulletSleeveAnimInstance;
 
-	/*UPROPERTY()
-	TObjectPtr<class UPoolComponent_AssaultRifle> ProjectilePool;*/
 };

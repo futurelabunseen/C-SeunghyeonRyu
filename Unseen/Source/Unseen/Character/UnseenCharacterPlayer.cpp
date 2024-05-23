@@ -710,7 +710,7 @@ void AUnseenCharacterPlayer::ShootProjectile()
 		//DrawDebugLine(GetWorld(), SpawnLocation, HitResult.TraceEnd + ProportionalVector, FColor::Green, true, 1.0f, 0, 0.2f);
 	}
 
-	// Todo : Object Polling ±¸Çö
+	// Object Polling
 	if (GetWeaponOnHand()->ProjectilePool != nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Projectile pool : %d"), GetWeaponOnHand()->ProjectilePool->Pool.Num());
@@ -719,18 +719,8 @@ void AUnseenCharacterPlayer::ShootProjectile()
 		Bullet->SetActorRotation(SpawnRotator);
 		Bullet->SetProjectileActive(true);
 		Bullet->SetLifeSpanToPool();
-		if (Bullet->ProjectileMovementComp->UpdatedComponent)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("oooooooooooo"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("xxxxxxxxxxxxxxx"));
-		}
-		UE_LOG(LogTemp, Warning, TEXT("IsActive : %d"), Bullet->ProjectileMovementComp->IsActive());
-		//UE_LOG(LogTemp, Warning, TEXT("IsSimulatingPhysics : %d"), Bullet->ProjectileMovementComp->UpdatedComponent->IsSimulatingPhysics());
-
 	}
 
+	// Not Using Object Polling
 	//GetWorld()->SpawnActor<AUS_Projectile_AssaultRifle>(AssaultRifleProjectileBPClass, SpawnLocation, SpawnRotator);
 }

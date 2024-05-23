@@ -52,7 +52,8 @@ bool UGA_Shoot::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 		UE_LOG(LogTemp, Warning, TEXT("No Ammo"));
 
 		//0발에 사격하면 재장전하게 하려고 했는데 차피 aim 중이라 안됨.
-		//ASC->TryActivateAbility(ASC->FindAbilitySpecFromInputID(8)->Handle);
+		//ASC->CancelAbility(ASC->FindAbilitySpecFromInputID(6)->Ability);
+		ASC->TryActivateAbility(ASC->FindAbilitySpecFromInputID(8)->Handle);
 
 		return false;
 	}

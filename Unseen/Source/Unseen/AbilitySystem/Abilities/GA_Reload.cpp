@@ -11,10 +11,11 @@ UGA_Reload::UGA_Reload()
 	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag("Character.Action.Reload"));
 	ActivationOwnedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsReloading"));
 
+	CancelAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("Character.Action.Aim"));
+
 	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsRolling"));
 	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsStepBack"));
 	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsSprinting"));
-	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("Character.State.IsAiming"));
 }
 
 void UGA_Reload::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

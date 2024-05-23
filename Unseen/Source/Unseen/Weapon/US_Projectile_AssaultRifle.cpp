@@ -37,8 +37,8 @@ void AUS_Projectile_AssaultRifle::BeginPlay()
 void AUS_Projectile_AssaultRifle::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Todo 面倒 单固瘤 贸府
-	UE_LOG(LogTemp, Warning, TEXT("Bullet Hit %s"), *OtherActor->GetName());
 
+	UE_LOG(LogTemp, Warning, TEXT("Bullet Hit %s"), *OtherActor->GetName());
 
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_LifeSpanToPoolExpired);
 	PushPoolSelf();
