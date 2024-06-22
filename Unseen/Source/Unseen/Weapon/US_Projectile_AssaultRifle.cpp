@@ -12,7 +12,7 @@ AUS_Projectile_AssaultRifle::AUS_Projectile_AssaultRifle()
 	LifeSpanTime = 3.5f;
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
-	SphereComp->SetCollisionProfileName("InvisibleWallDynamic");
+	SphereComp->SetCollisionProfileName("Bullet");
 	SphereComp->SetWorldScale3D(FVector(0.1625f, 0.1625f, 0.1625f));
 	SphereComp->SetSphereRadius(10.0f);
 	RootComponent = SphereComp;

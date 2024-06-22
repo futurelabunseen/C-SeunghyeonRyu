@@ -55,6 +55,7 @@ void AUSBossBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AUSBossBase::LimitBattleZone()
 {
+	// 나중에 투명벽 하나 만들어놓고 델리게이트로 구현
 	UE_LOG(LogTemp, Warning, TEXT("Create Battle Zone"));
 	// 벽 동그랗게 만들어둔 액터 스폰
 	if (BossFightHUDClass)
