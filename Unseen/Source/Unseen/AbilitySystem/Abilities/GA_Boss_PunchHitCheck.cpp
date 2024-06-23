@@ -40,7 +40,7 @@ void UGA_Boss_PunchHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetD
 		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
 		if (!SourceASC || !TargetASC)
 		{
-			UE_LOG(LogTemp, Error, TEXT("ASC not found!1"));
+			UE_LOG(LogTemp, Error, TEXT("ASC not found!"));
 			return;
 		}
 
@@ -48,14 +48,7 @@ void UGA_Boss_PunchHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetD
 		UUnseenCharacterAttributeSet* TargetAttribute = const_cast<UUnseenCharacterAttributeSet*>(TargetASC->GetSet<UUnseenCharacterAttributeSet>());
 		if (!SourceAttribute || !TargetAttribute)
 		{
-			if (!TargetAttribute)
-			{
-				UE_LOG(LogTemp, Error, TEXT("ASC not found!2"));
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("ASC not found!3"));
-			}
+			UE_LOG(LogTemp, Error, TEXT("ASC not found!"));
 			return;
 		}
 
