@@ -26,6 +26,8 @@ public:
 
 	ATTRIBUTE_ACCESSORS(UUnseenCharacterAttributeSet, Stamina);
 	ATTRIBUTE_ACCESSORS(UUnseenCharacterAttributeSet, MaxStamina);
+	ATTRIBUTE_ACCESSORS(UUnseenCharacterAttributeSet, Hp);
+	ATTRIBUTE_ACCESSORS(UUnseenCharacterAttributeSet, MaxHp);
 	ATTRIBUTE_ACCESSORS(UUnseenCharacterAttributeSet, RollStaminaCost);
 	ATTRIBUTE_ACCESSORS(UUnseenCharacterAttributeSet, StepBackStaminaCost);
 	ATTRIBUTE_ACCESSORS(UUnseenCharacterAttributeSet, SprintStaminaCost);
@@ -41,6 +43,10 @@ protected:
 	FGameplayAttributeData Stamina;
 	UPROPERTY(BlueprintReadOnly, Category = "CharacterInfo", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxStamina;
+	UPROPERTY(BlueprintReadOnly, Category = "CharacterInfo", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Hp;
+	UPROPERTY(BlueprintReadOnly, Category = "CharacterInfo", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData MaxHp;
 
 	UPROPERTY(BlueprintReadOnly, Category = "CharacterInfo", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData RollStaminaCost;

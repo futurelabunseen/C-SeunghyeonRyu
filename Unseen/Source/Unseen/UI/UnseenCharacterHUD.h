@@ -28,6 +28,9 @@ public:
 	TObjectPtr<class UProgressBar> StaminaBar;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	TObjectPtr<class UProgressBar> HpBar;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	TObjectPtr<class UImage> CrossHairLeft;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	TObjectPtr<class UImage> CrossHairRight;

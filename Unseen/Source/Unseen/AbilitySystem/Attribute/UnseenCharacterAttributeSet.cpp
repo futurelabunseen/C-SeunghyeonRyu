@@ -6,6 +6,8 @@
 UUnseenCharacterAttributeSet::UUnseenCharacterAttributeSet() :
 	Stamina(100.0f),
 	MaxStamina(100.0f),
+	Hp(100.0f),
+	MaxHp(100.0f),
 	RollStaminaCost(-30.0f),
 	StepBackStaminaCost(-30.0f),
 	SprintStaminaCost(-1.0f),
@@ -21,6 +23,12 @@ void UUnseenCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& 
 		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxStamina());
 	}
 	Super::PreAttributeChange(Attribute, NewValue);
+
+	if (Attribute == GetHpAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHp());
+	}
+	Super::PreAttributeChange(Attribute, NewValue);
 }
 
 void UUnseenCharacterAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
@@ -28,6 +36,12 @@ void UUnseenCharacterAttributeSet::PreAttributeBaseChange(const FGameplayAttribu
 	if (Attribute == GetStaminaAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxStamina());
+	}
+	Super::PreAttributeBaseChange(Attribute, NewValue);
+
+	if (Attribute == GetHpAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHp());
 	}
 	Super::PreAttributeBaseChange(Attribute, NewValue);
 }

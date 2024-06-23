@@ -64,6 +64,13 @@ void UUnseenCharacterHUD::NativeOnInitialized()
 		StaminaBar->SetFillColorAndOpacity(FLinearColor{ 0, 0.5f, 1.0f, 1.0f });
 	}
 
+	if (HpBar)
+	{
+		HpBar->BarFillType = EProgressBarFillType::LeftToRight;
+		HpBar->BarFillStyle = EProgressBarFillStyle::Mask;
+		HpBar->SetFillColorAndOpacity(FLinearColor{ 1.0f, 0.0f, 0.0f, 1.0f });
+	}
+
 	if (CrossHairLeft)
 	{
 		CrossHairLeft->SetColorAndOpacity(FLinearColor{ 1.0f, 0, 0, 1.0f });

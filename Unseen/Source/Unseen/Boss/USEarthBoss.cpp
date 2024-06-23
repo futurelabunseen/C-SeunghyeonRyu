@@ -8,6 +8,7 @@
 AUSEarthBoss::AUSEarthBoss()
 {
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
+	AttributeSetObject = CreateDefaultSubobject<UBossAttributeSet>(TEXT("AttributeSet"));
 
 	static ConstructorHelpers::FClassFinder<AActor> BattleZoneBPClassRef(TEXT("/Script/Engine.Blueprint'/Game/Boss/BattleZoneWall.BattleZoneWall_C'"));
 	if (BattleZoneBPClassRef.Class)
@@ -42,6 +43,7 @@ void AUSEarthBoss::PossessedBy(AController* NewController)
 		StartSpec.InputID = StartInputAbility.Key;
 		ASC->GiveAbility(StartSpec);
 	}
+	AttributeSet = ASC->GetSet<UBossAttributeSet>();
 }
 
 void AUSEarthBoss::BeginPlay()

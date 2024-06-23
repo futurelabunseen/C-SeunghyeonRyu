@@ -3,6 +3,10 @@
 
 #include "AbilitySystem/Abilities/GA_Boss_PunchHitCheck.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystem/Abilities/Tasks/AT_PunchHitCheck.h"
+#include "AbilitySystem/Abilities/TargetActors/TA_PunchHitCheck.h"
+#include "AbilitySystem/Attribute/UnseenCharacterAttributeSet.h"
+#include "AbilitySystem/Attribute/BossAttributeSet.h"
 
 UGA_Boss_PunchHitCheck::UGA_Boss_PunchHitCheck()
 {
@@ -15,6 +19,10 @@ void UGA_Boss_PunchHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 
 	UE_LOG(LogTemp, Warning, TEXT("Punch Hitcheck"));
 
+	UAT_PunchHitCheck* AttackTraceTask = UAT_PunchHitCheck::CreateTask(this, ATA_PunchHitCheck::StaticClass());
+	AttackTraceTask->OnComplete.AddDynamic(this, &UGA_Boss_PunchHitCheck::OnTraceResultCallback);
+	AttackTraceTask->ReadyForActivation();
+
 	bool bReplicatedEndAbility = true;
 	bool bWasCancelled = false;
 
@@ -23,4 +31,39 @@ void UGA_Boss_PunchHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 
 void UGA_Boss_PunchHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
+	if (UAbilitySystemBlueprintLibrary::TargetDataHasHitResult(TargetDataHandle, 0))
+	{
+		FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 0);
+		UE_LOG(LogTemp, Log, TEXT("Target %s Detected"), *(HitResult.GetActor()->GetName()));
+
+		UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Checked();
+		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
+		if (!SourceASC || !TargetASC)
+		{
+			UE_LOG(LogTemp, Error, TEXT("ASC not found!1"));
+			return;
+		}
+
+		const UBossAttributeSet* SourceAttribute = SourceASC->GetSet<UBossAttributeSet>();
+		UUnseenCharacterAttributeSet* TargetAttribute = const_cast<UUnseenCharacterAttributeSet*>(TargetASC->GetSet<UUnseenCharacterAttributeSet>());
+		if (!SourceAttribute || !TargetAttribute)
+		{
+			if (!TargetAttribute)
+			{
+				UE_LOG(LogTemp, Error, TEXT("ASC not found!2"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("ASC not found!3"));
+			}
+			return;
+		}
+
+		const float AttackDamage = SourceAttribute->GetPunchDamage();
+		TargetAttribute->SetHp(TargetAttribute->GetHp() - AttackDamage);
+	}
+
+	bool bReplicatedEndAbility = true;
+	bool bWasCancelled = false;
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
 }

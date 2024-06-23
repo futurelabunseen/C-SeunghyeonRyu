@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Boss/USBossBase.h"
 #include "AbilitySystemInterface.h"
+#include "AbilitySystem/Attribute/BossAttributeSet.h"
 #include "USEarthBoss.generated.h"
 
 /**
@@ -35,5 +36,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TMap<int32, TSubclassOf<class UGameplayAbility>> StartInputAbilities;
+
+	const UBossAttributeSet* AttributeSet;
+
+	UPROPERTY()
+	TObjectPtr<class UBossAttributeSet> AttributeSetObject;
 
 };

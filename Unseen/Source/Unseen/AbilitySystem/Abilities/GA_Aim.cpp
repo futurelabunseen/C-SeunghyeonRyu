@@ -37,7 +37,11 @@ void UGA_Aim::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGame
 {
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 	UnseenCharacter->bIsAiming = false;;
-	UnseenCharacter->bUseControllerRotationYaw = false;
+	//만약 move 중이면 true
+	if (!UnseenCharacter->bIsMoving)
+	{
+		UnseenCharacter->bUseControllerRotationYaw = false;
+	}
 	UnseenCharacter->GetCharacterMovement()->MaxWalkSpeed = 300.f;
 
 	UnseenCharacter->AimCameraLerp();

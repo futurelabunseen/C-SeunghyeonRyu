@@ -37,6 +37,7 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	bIsBlockedRegenStamina = false;
 	bIsSprinting = false;
 	bIsShooting = false;
+	bIsMoving = false;
 
 	// HUD
 	static ConstructorHelpers::FClassFinder<UUserWidget> HUDClassRef(TEXT("/Game/UI/WBP_UnseenPlayerHUD.WBP_UnseenPlayerHUD_C"));

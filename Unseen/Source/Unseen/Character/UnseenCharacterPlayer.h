@@ -213,6 +213,9 @@ public:
 	uint8 bIsRollStepBackActive : 1;
 
 	UPROPERTY()
+	uint8 bIsMoving : 1;
+
+	UPROPERTY()
 	uint8 bIsAiming : 1;
 
 	UPROPERTY()

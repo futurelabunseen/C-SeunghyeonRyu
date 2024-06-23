@@ -24,6 +24,7 @@ void UGA_Move::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
+	UnseenCharacter->bIsMoving = true;
 	UnseenCharacter->bUseControllerRotationYaw = true;
 }
 
@@ -47,6 +48,8 @@ void UGA_Move::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGam
 
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 	
+	UnseenCharacter->bIsMoving = false;
+
 	if (!UnseenCharacter->bIsAiming)
 	{
 		UnseenCharacter->bUseControllerRotationYaw = false;
