@@ -51,6 +51,8 @@ void AUSEarthBoss::PossessedBy(AController* NewController)
 void AUSEarthBoss::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SpawnedPos = GetActorLocation();
 }
 
 void AUSEarthBoss::Tick(float DeltaTime)

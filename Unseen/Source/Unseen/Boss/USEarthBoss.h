@@ -51,4 +51,7 @@ protected:
 public:
 	UPROPERTY(BlueprintReadWrite)
 	FVector SkillPos;
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector SpawnedPos;
 };
