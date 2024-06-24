@@ -177,6 +177,8 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 		AssaultRifleProjectileBPClass = AssaultRifleProjectileBPClassRef.Class;
 	}
 
+	
+
 	RollMovementTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RollMovementTimeline"));
 	RollDistance = 400.f;
 

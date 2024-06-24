@@ -16,9 +16,7 @@
 #include "AbilitySystem/Attribute/UnseenCharacterAttributeSet.h"
 #include "UnseenCharacterPlayer.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class UNSEEN_API AUnseenCharacterPlayer : public AUnseenCharacterBase, public IAbilitySystemInterface
 {
