@@ -2,6 +2,8 @@
 
 
 #include "Weapon/AssaultRifle.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
 AAssaultRifle::AAssaultRifle()
@@ -43,6 +45,12 @@ AAssaultRifle::AAssaultRifle()
 	if (nullptr != BulletSleeveSKMeshRef.Object)
 	{
 		BulletSleeveSKMesh = BulletSleeveSKMeshRef.Object;
+	}
+	//Sound
+	static ConstructorHelpers::FObjectFinder<USoundCue> ShootSoundObject(TEXT("/Script/Engine.SoundCue'/Game/Vefects/Shots_VFX/Audio/SFX_Vefects_Shots_Weapon_Rifle_Cue.SFX_Vefects_Shots_Weapon_Rifle_Cue'"));
+	if (nullptr != ShootSoundObject.Object)
+	{
+		ShootSound = ShootSoundObject.Object;
 	}
 
 	//SkeletalMeshComponent
@@ -149,6 +157,8 @@ void AAssaultRifle::ShootWeapon()
 {
 	Super::ShootWeapon();
 	
+	UGameplayStatics::PlaySound2D(this, ShootSound);
+
 	CurrentAmmo -= 1;
 	GetWorld()->GetFirstPlayerController()->GetPawn()->AddControllerPitchInput(-CurrentVerticalRecoil);
 	GetWorld()->SpawnActor<ABullet_Sleeve>(ABullet_Sleeve::StaticClass(), MainBody->GetSocketLocation(FName("Sleeve")), MainBody->GetSocketRotation(FName("Sleeve")));
@@ -156,7 +166,6 @@ void AAssaultRifle::ShootWeapon()
 	float AmountHorizontalRecoil = MaxHorizontalRecoil - CurrentHorizontalRecoil < HorizontalRecoilAmount ? MaxHorizontalRecoil - CurrentHorizontalRecoil : HorizontalRecoilAmount;
 	CurrentHorizontalRecoil += AmountHorizontalRecoil;
 	ChangeMaterialBulletVariable();
-	UE_LOG(LogTemp, Warning, TEXT("Current Ammo : %d"), CurrentAmmo);
 	
 	//รั น฿ป็ ทฮม๗
 

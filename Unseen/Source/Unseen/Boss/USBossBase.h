@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "USBossBase.generated.h"
 
+class USoundCue;
+
 UCLASS()
 class UNSEEN_API AUSBossBase : public ACharacter
 {
@@ -52,4 +54,9 @@ public:
 	UPROPERTY()
 	TObjectPtr<class AActor> BattleZone;
 	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = true))
+	USoundCue* HitSound;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = true))
+	USoundCue* CriticalHitSound;
 };

@@ -3,6 +3,9 @@
 
 #include "Boss/USBossBase.h"
 #include "UI/BossFightHUD.h"
+#include "Weapon/BulletDamageCauser.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
 AUSBossBase::AUSBossBase()
@@ -17,6 +20,19 @@ AUSBossBase::AUSBossBase()
 	BossFightHUD = nullptr;
 	BattleZoneBPClass = nullptr;
 	BattleZone = nullptr;
+
+	static ConstructorHelpers::FObjectFinder<USoundCue> HitAudioObject(TEXT("/Script/Engine.SoundCue'/Game/Vefects/Shots_VFX/Audio/SFX_Vefects_Shots_Squib_Dirt_Cue.SFX_Vefects_Shots_Squib_Dirt_Cue'"));
+	if (nullptr != HitAudioObject.Object)
+	{
+		HitSound = HitAudioObject.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundCue> CriticalAudioObject(TEXT("/Script/Engine.SoundCue'/Game/Vefects/Shots_VFX/Audio/SFX_Vefects_Shots_Squib_Metal_Cue.SFX_Vefects_Shots_Squib_Metal_Cue'"));
+	if (nullptr != CriticalAudioObject.Object)
+	{
+		CriticalHitSound = CriticalAudioObject.Object;
+	}
+	
 }
 
 // Called when the game starts or when spawned
@@ -40,8 +56,6 @@ void AUSBossBase::Tick(float DeltaTime)
 			bIsBattleStart = true;
 			LimitBattleZone();
 		}
-		// 범위 안에 플레이어 들어왔는지 체크
-		// 들어오면 LimitBattleZone(영역전개)하고 bIsBattleStart = true;
 		// 나중에 투명벽 하나 만들어놓고 델리게이트로 구현
 	}
 
@@ -74,7 +88,21 @@ float AUSBossBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 {
 	if (bIsBattleStart)
 	{
-		if (CurrentHp <= DamageAmount)
+		float Damage;
+		ABulletDamageCauser* CustomCauser = Cast<ABulletDamageCauser>(DamageCauser);
+		
+		if (CustomCauser->ComponentName == TEXT("WeakPoint"))
+		{
+			Damage = DamageAmount * 1.5f;
+			UGameplayStatics::PlaySound2D(this, CriticalHitSound);
+		}
+		else
+		{
+			Damage = DamageAmount;
+			UGameplayStatics::PlaySound2D(this, HitSound);
+		}
+		
+		if (CurrentHp <= Damage)
 		{
 			CurrentHp = 0;
 			UE_LOG(LogTemp, Warning, TEXT("Boss Die"));
@@ -92,7 +120,7 @@ float AUSBossBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 		}
 		else
 		{
-			CurrentHp -= DamageAmount;
+			CurrentHp -= Damage;
 			UE_LOG(LogTemp, Warning, TEXT("Boss Hp : %d"), CurrentHp);
 		}
 
