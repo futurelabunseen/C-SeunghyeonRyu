@@ -33,7 +33,7 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	// Get Ability System from PlayerState
 	ASC = nullptr;
 
-	bIsRollStepBackActive = true;
+	bIsRollStepBackActive = false;
 	bIsBlockedRegenStamina = false;
 	bIsSprinting = false;
 	bIsShooting = false;
@@ -344,11 +344,11 @@ void AUnseenCharacterPlayer::Tick(float DeltaTime)
 	Start.Z = 0.f;
 	FVector RollDirection = (FVector(CalculateRollDirection().X, CalculateRollDirection().Y, 0.f)).GetSafeNormal();
 
-	DrawDebugDirectionalArrow(GetWorld(), Start, Start + Forward * 100.f,
+	/*DrawDebugDirectionalArrow(GetWorld(), Start, Start + Forward * 100.f,
 		5.f, FColor::Red, false, -1.f, 0, 2.f);
 
 	DrawDebugDirectionalArrow(GetWorld(), Start, Start + RollDirection * 100.f,
-		5.f, FColor::Yellow, false, -1.f, 0, 2.f);
+		5.f, FColor::Yellow, false, -1.f, 0, 2.f);*/
 
 }
 

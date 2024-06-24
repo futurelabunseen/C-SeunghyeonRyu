@@ -41,7 +41,7 @@ void UAT_Skill::SpawnAndInitializeTargetActor()
 	SpawnedTargetActor = Cast<ATA_SkillHitCheck>(Ability->GetWorld()->SpawnActorDeferred<AGameplayAbilityTargetActor>(TargetActorClass, FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
 	if (SpawnedTargetActor)
 	{
-		SpawnedTargetActor->SetShowDebug(true);
+		//SpawnedTargetActor->SetShowDebug(true);
 		SpawnedTargetActor->TargetDataReadyDelegate.AddUObject(this, &UAT_Skill::OnTargetDataReadyCallback);
 	}
 }

@@ -41,7 +41,7 @@ void UAT_PunchHitCheck::SpawnAndInitializeTargetActor()
 	SpawnedTargetActor = Cast<ATA_PunchHitCheck>(Ability->GetWorld()->SpawnActorDeferred<AGameplayAbilityTargetActor>(TargetActorClass, FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
 	if (SpawnedTargetActor)
 	{
-		SpawnedTargetActor->SetShowDebug(true);
+		//SpawnedTargetActor->SetShowDebug(true);
 		SpawnedTargetActor->TargetDataReadyDelegate.AddUObject(this, &UAT_PunchHitCheck::OnTargetDataReadyCallback);
 	}
 }
