@@ -42,4 +42,13 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class UBossAttributeSet> AttributeSetObject;
 
+	UPROPERTY(EditAnywhere, Category = AI)
+	class UBehaviorTree* BossBehaviorTree;
+
+	UFUNCTION(BlueprintCallable)
+	void SetSkillPos();
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	FVector SkillPos;
 };

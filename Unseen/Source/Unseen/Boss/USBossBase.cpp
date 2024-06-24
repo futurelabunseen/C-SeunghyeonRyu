@@ -23,7 +23,7 @@ AUSBossBase::AUSBossBase()
 void AUSBossBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -42,6 +42,7 @@ void AUSBossBase::Tick(float DeltaTime)
 		}
 		// 범위 안에 플레이어 들어왔는지 체크
 		// 들어오면 LimitBattleZone(영역전개)하고 bIsBattleStart = true;
+		// 나중에 투명벽 하나 만들어놓고 델리게이트로 구현
 	}
 
 }
@@ -55,7 +56,7 @@ void AUSBossBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AUSBossBase::LimitBattleZone()
 {
-	// 나중에 투명벽 하나 만들어놓고 델리게이트로 구현
+	
 	UE_LOG(LogTemp, Warning, TEXT("Create Battle Zone"));
 	// 벽 동그랗게 만들어둔 액터 스폰
 	if (BossFightHUDClass)

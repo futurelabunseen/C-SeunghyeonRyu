@@ -25,8 +25,12 @@ public:
 	UBossAttributeSet();
 
 	ATTRIBUTE_ACCESSORS(UBossAttributeSet, PunchDamage);
+	ATTRIBUTE_ACCESSORS(UBossAttributeSet, SkillDamage);
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "BossInfo", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData PunchDamage;
+
+	UPROPERTY(BlueprintReadOnly, Category = "BossInfo", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData SkillDamage;
 };

@@ -7,6 +7,7 @@
 #include "AbilitySystem/Abilities/TargetActors/TA_PunchHitCheck.h"
 #include "AbilitySystem/Attribute/UnseenCharacterAttributeSet.h"
 #include "AbilitySystem/Attribute/BossAttributeSet.h"
+#include "Character/UnseenCharacterPlayer.h"
 
 UGA_Boss_PunchHitCheck::UGA_Boss_PunchHitCheck()
 {
@@ -52,8 +53,12 @@ void UGA_Boss_PunchHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetD
 			return;
 		}
 
-		const float AttackDamage = SourceAttribute->GetPunchDamage();
-		TargetAttribute->SetHp(TargetAttribute->GetHp() - AttackDamage);
+		if (!CastChecked<AUnseenCharacterPlayer>(HitResult.GetActor())->bIsRollStepBackActive)
+		{
+			const float AttackDamage = SourceAttribute->GetPunchDamage();
+			TargetAttribute->SetHp(TargetAttribute->GetHp() - AttackDamage);
+		}
+		
 	}
 
 	bool bReplicatedEndAbility = true;

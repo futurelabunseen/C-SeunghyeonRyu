@@ -4,6 +4,8 @@
 #include "Boss/USEarthBoss.h"
 #include "AbilitySystemComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "AIController.h"
+#include "Kismet/GameplayStatics.h"
 
 AUSEarthBoss::AUSEarthBoss()
 {
@@ -64,6 +66,17 @@ void AUSEarthBoss::LimitBattleZone()
 
 	BattleZone = GetWorld()->SpawnActor<AActor>(BattleZoneBPClass, GetActorLocation(), FRotator::ZeroRotator);
 
-	// ui ¶ç¿ì±â
+	Cast<AAIController>(GetController())->RunBehaviorTree(BossBehaviorTree);
+}
+
+void AUSEarthBoss::SetSkillPos()
+{
+	AActor* PlayerActor = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	FVector PlayerLocation = PlayerActor->GetActorLocation();
+
+	int32 RandomValue1 = FMath::RandRange(0, 400);
+	int32 RandomValue2 = FMath::RandRange(0, 400);
+
+	SkillPos = FVector(PlayerLocation.X + RandomValue1, PlayerLocation.Y + RandomValue2, PlayerLocation.Z);
 }
 

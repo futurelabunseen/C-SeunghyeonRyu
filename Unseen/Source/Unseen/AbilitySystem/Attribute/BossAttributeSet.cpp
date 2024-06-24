@@ -4,7 +4,8 @@
 #include "AbilitySystem/Attribute/BossAttributeSet.h"
 
 UBossAttributeSet::UBossAttributeSet() :
-	PunchDamage(30.0f)
+	PunchDamage(30.0f),
+	SkillDamage(70.0f)
 {
 	
 }
