@@ -4,6 +4,8 @@
 #include "Weapon/AssaultRifle.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
 
 // Sets default values
 AAssaultRifle::AAssaultRifle()
@@ -51,6 +53,11 @@ AAssaultRifle::AAssaultRifle()
 	if (nullptr != ShootSoundObject.Object)
 	{
 		ShootSound = ShootSoundObject.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> MuzzleFlashObject(TEXT("/Script/Niagara.NiagaraSystem'/Game/Vefects/Shots_VFX/VFX/MuzzleFlash/FX_MuzzleFlash_Rifle.FX_MuzzleFlash_Rifle'"));
+	if (nullptr != MuzzleFlashObject.Object)
+	{
+		MuzzleFlashEffect = MuzzleFlashObject.Object;
 	}
 
 	//SkeletalMeshComponent
@@ -158,6 +165,12 @@ void AAssaultRifle::ShootWeapon()
 	Super::ShootWeapon();
 	
 	UGameplayStatics::PlaySound2D(this, ShootSound);
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		MuzzleFlashEffect,
+		Silencer->GetSocketLocation(FName("Muzzle")),
+		Silencer->GetSocketRotation(FName("Muzzle"))
+	);
 
 	CurrentAmmo -= 1;
 	GetWorld()->GetFirstPlayerController()->GetPawn()->AddControllerPitchInput(-CurrentVerticalRecoil);

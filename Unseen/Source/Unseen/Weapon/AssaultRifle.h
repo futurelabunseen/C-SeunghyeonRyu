@@ -77,4 +77,7 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = true))
 	USoundCue* ShootSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	TObjectPtr<class UNiagaraSystem> MuzzleFlashEffect;
 };
