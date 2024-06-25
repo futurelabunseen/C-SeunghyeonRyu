@@ -281,12 +281,23 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = Money)
 	float MaxMoney;
+
+	UPROPERTY(BlueprintReadWrite, Category = Money)
+	float ShootRateMoney;
+	UPROPERTY(BlueprintReadWrite, Category = Money)
+	float VerticalRecoilMoney;
+	UPROPERTY(BlueprintReadWrite, Category = Money)
+	float HorizontalRecoilMoney;
+	UPROPERTY(BlueprintReadWrite, Category = Money)
+	float BulletMoney;
+	UPROPERTY(EditAnywhere, Category = Animation)
+	int CharacterMaxAmmo;
+
+	UFUNCTION()
+	void OnDieCallback();
 protected:
 	UPROPERTY(EditAnywhere, Category = Animation)
 	TObjectPtr<class UAnimMontage> RifleMainBodyShootMontage;
-
-	UPROPERTY(EditAnywhere, Category = Animation)
-	int CharacterMaxAmmo;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AUS_Projectile_AssaultRifle> AssaultRifleProjectileBPClass;
@@ -296,6 +307,21 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void IncreaseShootRate(float ShootRate);
+
+	UFUNCTION(BlueprintCallable)
+	void DecreaseVerticalRecoil(float value);
+
+	UFUNCTION(BlueprintCallable)
+	void DecreaseHorizontalRecoil(float value);
+
+	UFUNCTION(BlueprintCallable)
+	bool UseMoney(float value);
+
+	UFUNCTION(BlueprintCallable)
+	bool CanIncraseBullet(int value);
+
+	UFUNCTION(BlueprintCallable)
+	void IncraseBullet(int value);
 
 	const UUnseenCharacterAttributeSet* AttributeSet;
 

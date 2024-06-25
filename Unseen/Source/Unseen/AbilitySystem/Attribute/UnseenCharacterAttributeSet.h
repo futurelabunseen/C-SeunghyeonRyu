@@ -7,15 +7,14 @@
 #include "AbilitySystemComponent.h"
 #include "UnseenCharacterAttributeSet.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDieDelegate);
+
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
 	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
-/**
- * 
- */
 UCLASS()
 class UNSEEN_API UUnseenCharacterAttributeSet : public UAttributeSet
 {
@@ -33,6 +32,8 @@ public:
 	ATTRIBUTE_ACCESSORS(UUnseenCharacterAttributeSet, SprintStaminaCost);
 	ATTRIBUTE_ACCESSORS(UUnseenCharacterAttributeSet, ShootRate);
 
+	UPROPERTY(BlueprintAssignable)
+	FOnDieDelegate OnDie;
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;

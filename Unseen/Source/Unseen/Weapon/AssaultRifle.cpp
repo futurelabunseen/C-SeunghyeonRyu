@@ -103,11 +103,11 @@ AAssaultRifle::AAssaultRifle()
 
 	MaxAmmo = 30;
 
-	MaxVerticalRecoil = 1.0f;
-	MaxHorizontalRecoil = 20.0f; // 10
+	MaxVerticalRecoil = 2.0f;
+	MaxHorizontalRecoil = 40.0f; // 10
 	CurrentVerticalRecoil = MaxVerticalRecoil;
 	CurrentHorizontalRecoil = 0.0f;
-	HorizontalRecoilAmount = 2.0f; // 1
+	HorizontalRecoilAmount = 4.0f; // 1
 
 	ProjectilePool = CreateDefaultSubobject<UPoolComponent_AssaultRifle>(TEXT("ProjectilePool"));
 

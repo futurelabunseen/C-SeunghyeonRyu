@@ -41,6 +41,10 @@ void UUnseenCharacterAttributeSet::PreAttributeBaseChange(const FGameplayAttribu
 
 	if (Attribute == GetHpAttribute())
 	{
+		if (NewValue <= 0.0f)
+		{
+			OnDie.Broadcast();
+		}
 		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHp());
 	}
 	Super::PreAttributeBaseChange(Attribute, NewValue);

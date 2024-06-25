@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class UNSEEN_API UAttackDamageWidget : public UUserWidget
 {
 	GENERATED_BODY()

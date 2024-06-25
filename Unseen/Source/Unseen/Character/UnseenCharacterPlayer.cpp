@@ -198,6 +198,10 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	StartMoney = 1000.0f;
 	Money = StartMoney;
 	MaxMoney = 100000.0f;
+	ShootRateMoney = 500.0f;
+	VerticalRecoilMoney = 500.0f;
+	HorizontalRecoilMoney = 500.0f;
+	BulletMoney = 500.0f;
 }
 
 void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
@@ -225,6 +229,7 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 
 		SetupGASInputComponent();
 		AttributeSet = ASC->GetSet<UUnseenCharacterAttributeSet>();
+		//AttributeSet->OnDie.AddDynamic(this, &AUnseenCharacterPlayer::OnDieCallback); 왜 안 되지
 	}
 	
 	//APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
@@ -669,6 +674,11 @@ bool AUnseenCharacterPlayer::IsCanReload()
 	return (CharacterCurrentAmmo > 0 && !GetWeaponOnHand()->IsAmmoFull());
 }
 
+void AUnseenCharacterPlayer::OnDieCallback()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Die"));
+}
+
 void AUnseenCharacterPlayer::ChangeShootRate(float ShootRate)
 {
 	ASC->SetNumericAttributeBase(AttributeSet->GetShootRateAttribute(), ShootRate);
@@ -680,6 +690,48 @@ void AUnseenCharacterPlayer::IncreaseShootRate(float ShootRate)
 	float CurrentValue = AttributeSet->GetShootRate();
 	ASC->SetNumericAttributeBase(AttributeSet->GetShootRateAttribute(), CurrentValue + ShootRate);
 	GetWeaponOnHand()->ShootRate = CurrentValue + ShootRate;
+}
+
+void AUnseenCharacterPlayer::DecreaseVerticalRecoil(float value)
+{
+	GetWeaponOnHand()->CurrentVerticalRecoil -= value;
+}
+
+void AUnseenCharacterPlayer::DecreaseHorizontalRecoil(float value)
+{
+	GetWeaponOnHand()->HorizontalRecoilAmount -= value;
+}
+
+bool AUnseenCharacterPlayer::UseMoney(float value)
+{
+	if (Money >= value)
+	{
+		Money -= value;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool AUnseenCharacterPlayer::CanIncraseBullet(int value)
+{
+	int temp = CharacterCurrentAmmo + value;
+
+	if (temp <= CharacterMaxAmmo)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void AUnseenCharacterPlayer::IncraseBullet(int value)
+{
+	CharacterCurrentAmmo += value;
 }
 
 void AUnseenCharacterPlayer::ShootProjectile()

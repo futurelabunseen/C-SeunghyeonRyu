@@ -24,7 +24,7 @@ AUSEarthBoss::AUSEarthBoss()
 		BossFightHUDClass = BossFightHUDClassRef.Class;
 	}
 
-	MaxHp = 10000;
+	MaxHp = 20000;
 	CurrentHp = MaxHp;
 }
 
