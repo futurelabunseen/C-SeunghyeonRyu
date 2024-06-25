@@ -195,6 +195,9 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	bApplyRecoil = true;
 
 	tempVal = 600.0f;
+	StartMoney = 1000.0f;
+	Money = StartMoney;
+	MaxMoney = 100000.0f;
 }
 
 void AUnseenCharacterPlayer::PossessedBy(AController* NewController)

@@ -273,6 +273,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Animation)
 	int CharacterCurrentAmmo;
 
+	UPROPERTY(BlueprintReadWrite, Category = Money)
+	float Money;
+
+	UPROPERTY(BlueprintReadOnly, Category = Money)
+	float StartMoney;
+
+	UPROPERTY(BlueprintReadOnly, Category = Money)
+	float MaxMoney;
 protected:
 	UPROPERTY(EditAnywhere, Category = Animation)
 	TObjectPtr<class UAnimMontage> RifleMainBodyShootMontage;
@@ -296,5 +304,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = temp)
 	float tempVal;
+
+
 
 };

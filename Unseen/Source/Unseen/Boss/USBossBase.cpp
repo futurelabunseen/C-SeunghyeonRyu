@@ -6,6 +6,9 @@
 #include "Weapon/BulletDamageCauser.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "UI/DamageWidgetActor.h"
+#include "Character/UnseenCharacterPlayer.h"
+#include "Engine/DamageEvents.h"
 
 // Sets default values
 AUSBossBase::AUSBossBase()
@@ -20,6 +23,7 @@ AUSBossBase::AUSBossBase()
 	BossFightHUD = nullptr;
 	BattleZoneBPClass = nullptr;
 	BattleZone = nullptr;
+	PlayerCharacterPtr = nullptr;
 
 	static ConstructorHelpers::FObjectFinder<USoundCue> HitAudioObject(TEXT("/Script/Engine.SoundCue'/Game/Vefects/Shots_VFX/Audio/SFX_Vefects_Shots_Squib_Dirt_Cue.SFX_Vefects_Shots_Squib_Dirt_Cue'"));
 	if (nullptr != HitAudioObject.Object)
@@ -70,7 +74,7 @@ void AUSBossBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AUSBossBase::LimitBattleZone()
 {
-	
+	PlayerCharacterPtr = CastChecked<AUnseenCharacterPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	UE_LOG(LogTemp, Warning, TEXT("Create Battle Zone"));
 	// 벽 동그랗게 만들어둔 액터 스폰
 	if (BossFightHUDClass)
@@ -88,6 +92,7 @@ float AUSBossBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 {
 	if (bIsBattleStart)
 	{
+		FPointDamageEvent* const PointDamageEvent = (FPointDamageEvent*)&DamageEvent;
 		float Damage;
 		ABulletDamageCauser* CustomCauser = Cast<ABulletDamageCauser>(DamageCauser);
 		
@@ -95,11 +100,13 @@ float AUSBossBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 		{
 			Damage = DamageAmount * 1.5f;
 			UGameplayStatics::PlaySound2D(this, CriticalHitSound);
+			GetWorld()->SpawnActor<ADamageWidgetActor>(ADamageWidgetActor::StaticClass(), PointDamageEvent->HitInfo.ImpactPoint, FRotator::ZeroRotator)->SetDamage(Damage, FLinearColor::Red);
 		}
 		else
 		{
 			Damage = DamageAmount;
 			UGameplayStatics::PlaySound2D(this, HitSound);
+			GetWorld()->SpawnActor<ADamageWidgetActor>(ADamageWidgetActor::StaticClass(), PointDamageEvent->HitInfo.ImpactPoint, FRotator::ZeroRotator)->SetDamage(Damage, FLinearColor::Blue);
 		}
 		
 		if (CurrentHp <= Damage)
@@ -129,7 +136,11 @@ float AUSBossBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 			BossFightHUD->SetHealthBar(CurrentHp, MaxHp);
 		}
 
-		return DamageAmount;
+		float ResultMoney = PlayerCharacterPtr->Money + Damage;
+		ResultMoney = ResultMoney > PlayerCharacterPtr->MaxMoney ? PlayerCharacterPtr->MaxMoney : ResultMoney;
+		PlayerCharacterPtr->Money = ResultMoney;
+
+		return Damage;
 	}
 	return 0.0f;
 }

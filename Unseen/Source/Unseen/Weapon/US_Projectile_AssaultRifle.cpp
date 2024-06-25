@@ -48,7 +48,8 @@ void AUS_Projectile_AssaultRifle::OnHit(UPrimitiveComponent* HitComponent, AActo
 	ABulletDamageCauser* DamageCauser = NewObject<ABulletDamageCauser>();
 	DamageCauser->ComponentName = OtherComp->GetName();
 	int Damage = FMath::RandRange(-10, 10) + CurrentDamage;
-	UGameplayStatics::ApplyDamage(OtherActor, Damage, nullptr, DamageCauser, DamageType);
+	UGameplayStatics::ApplyPointDamage(OtherActor, Damage, OtherActor->GetActorLocation(), Hit, nullptr, DamageCauser, DamageType);
+	//UGameplayStatics::ApplyDamage(OtherActor, Damage, nullptr, DamageCauser, DamageType);
 
 	//UE_LOG(LogTemp, Warning, TEXT("Bullet Hit %s"), *OtherActor->GetName());
 

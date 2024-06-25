@@ -54,6 +54,9 @@ public:
 	UPROPERTY()
 	TObjectPtr<class AActor> BattleZone;
 	
+	UPROPERTY()
+	TObjectPtr<class AUnseenCharacterPlayer> PlayerCharacterPtr;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = true))
 	USoundCue* HitSound;
 
