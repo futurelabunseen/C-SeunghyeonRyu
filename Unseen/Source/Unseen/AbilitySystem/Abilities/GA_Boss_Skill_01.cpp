@@ -8,10 +8,18 @@
 #include "AbilitySystem/Attribute/UnseenCharacterAttributeSet.h"
 #include "AbilitySystem/Attribute/BossAttributeSet.h"
 #include "Character/UnseenCharacterPlayer.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 UGA_Boss_Skill_01::UGA_Boss_Skill_01()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+
+	static ConstructorHelpers::FObjectFinder<USoundCue> HitSoundObject(TEXT("/Script/Engine.SoundCue'/Game/Sound/hit_Cue.hit_Cue'"));
+	if (nullptr != HitSoundObject.Object)
+	{
+		HitSound = HitSoundObject.Object;
+	}
 }
 
 void UGA_Boss_Skill_01::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -56,6 +64,7 @@ void UGA_Boss_Skill_01::OnTraceResultCallback(const FGameplayAbilityTargetDataHa
 		{
 			const float SkillDamage = SourceAttribute->GetSkillDamage();
 			TargetAttribute->SetHp(TargetAttribute->GetHp() - SkillDamage);
+			UGameplayStatics::PlaySound2D(this, HitSound);
 		}
 	}
 

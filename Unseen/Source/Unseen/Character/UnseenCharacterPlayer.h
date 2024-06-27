@@ -350,6 +350,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = temp)
 	float tempVal;
 
-
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = true))
+	TObjectPtr<class USoundCue> GameOverSound;
 
 };

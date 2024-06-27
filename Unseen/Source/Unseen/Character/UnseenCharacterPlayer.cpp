@@ -17,6 +17,8 @@
 #include "DrawDebugHelpers.h"
 #include "UI/PauseMenu.h"
 #include "UI/GameOver.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 #include "Game/UnseenGameInstance.h"
 
 AUnseenCharacterPlayer::AUnseenCharacterPlayer()
@@ -194,7 +196,11 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 		AssaultRifleProjectileBPClass = AssaultRifleProjectileBPClassRef.Class;
 	}
 
-	
+	static ConstructorHelpers::FObjectFinder<USoundCue> GameOverSoundObject(TEXT("/Script/Engine.SoundCue'/Game/Sound/gameover_Cue.gameover_Cue'"));
+	if (nullptr != GameOverSoundObject.Object)
+	{
+		GameOverSound = GameOverSoundObject.Object;
+	}
 
 	RollMovementTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RollMovementTimeline"));
 	RollDistance = 400.f;
@@ -716,9 +722,14 @@ void AUnseenCharacterPlayer::OnDieCallback()
 	{
 		bIsDead = true;
 		UE_LOG(LogTemp, Warning, TEXT("Die"));
-		//·¡±×µ¹
+		UGameplayStatics::PlaySound2D(this, GameOverSound);
+
+		
+		GetSpringArmComponent()->TargetArmLength = 500;
 		GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+		GetCharacterMovement()->DisableMovement();
 		GetMesh()->SetSimulatePhysics(true);
+
 
 		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 		if (RestartUIClass)

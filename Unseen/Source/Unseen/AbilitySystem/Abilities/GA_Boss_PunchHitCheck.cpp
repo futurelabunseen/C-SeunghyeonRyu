@@ -8,10 +8,18 @@
 #include "AbilitySystem/Attribute/UnseenCharacterAttributeSet.h"
 #include "AbilitySystem/Attribute/BossAttributeSet.h"
 #include "Character/UnseenCharacterPlayer.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 UGA_Boss_PunchHitCheck::UGA_Boss_PunchHitCheck()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+
+	static ConstructorHelpers::FObjectFinder<USoundCue> HitSoundObject(TEXT("/Script/Engine.SoundCue'/Game/Sound/hit_Cue.hit_Cue'"));
+	if (nullptr != HitSoundObject.Object)
+	{
+		HitSound = HitSoundObject.Object;
+	}
 }
 
 void UGA_Boss_PunchHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -57,6 +65,7 @@ void UGA_Boss_PunchHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetD
 		{
 			const float AttackDamage = SourceAttribute->GetPunchDamage();
 			TargetAttribute->SetHp(TargetAttribute->GetHp() - AttackDamage);
+			UGameplayStatics::PlaySound2D(this, HitSound);
 		}
 		
 	}

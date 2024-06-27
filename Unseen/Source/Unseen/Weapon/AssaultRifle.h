@@ -10,7 +10,6 @@
 #include "Weapon/PoolComponent_AssaultRifle.h"
 #include "AssaultRifle.generated.h"
 
-class USoundCue;
 
 UCLASS()
 class UNSEEN_API AAssaultRifle : public AUnseenWeaponBase
@@ -78,7 +77,7 @@ protected:
 	TObjectPtr<class UWeaponAnimInstance> BulletSleeveAnimInstance;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = true))
-	USoundCue* ShootSound;
+	TObjectPtr<class USoundCue> ShootSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	TObjectPtr<class UNiagaraSystem> MuzzleFlashEffect;
