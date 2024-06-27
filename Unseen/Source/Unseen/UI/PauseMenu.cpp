@@ -8,6 +8,22 @@ UPauseMenu::UPauseMenu(const FObjectInitializer& ObjectInitializer) : Super(Obje
 
 }
 
+void UPauseMenu::InitialUI()
+{
+	for (int i = 0; i < ShootRateCnt; i++)
+	{
+		FillSRB(i);
+	}
+	for (int i = 0; i < VerticalCnt; i++)
+	{
+		FillDVR(i);
+	}
+	for (int i = 0; i < HorizontalCnt; i++)
+	{
+		FillDHR(i);
+	}
+}
+
 void UPauseMenu::FillSRB(int index)
 {
 	if (index == 0)

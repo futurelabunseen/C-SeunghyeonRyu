@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "AIController.h"
 #include "Kismet/GameplayStatics.h"
+#include "Game/UnseenGameModeBase.h"
 
 AUSEarthBoss::AUSEarthBoss()
 {
@@ -23,6 +24,14 @@ AUSEarthBoss::AUSEarthBoss()
 	{
 		BossFightHUDClass = BossFightHUDClassRef.Class;
 	}
+
+	/*static ConstructorHelpers::FObjectFinder<UBehaviorTree> BehaviorTreeObj(TEXT("/Game/Boss/BT_Boss.BT_Boss"));
+	if (BehaviorTreeObj.Succeeded())
+	{
+		BossBehaviorTree = BehaviorTreeObj.Object;
+	}*/
+
+	
 
 	MaxHp = 20000;
 	CurrentHp = MaxHp;
@@ -53,6 +62,8 @@ void AUSEarthBoss::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnedPos = GetActorLocation();
+	CastChecked<AUnseenGameModeBase>(GetWorld()->GetAuthGameMode())->OnRespawn.AddDynamic(this, &AUSEarthBoss::OnRespawnCallback);
+
 }
 
 void AUSEarthBoss::Tick(float DeltaTime)
@@ -80,5 +91,10 @@ void AUSEarthBoss::SetSkillPos()
 	int32 RandomValue2 = FMath::RandRange(0, 400);
 
 	SkillPos = FVector(PlayerLocation.X + RandomValue1, PlayerLocation.Y + RandomValue2, PlayerLocation.Z);
+}
+
+void AUSEarthBoss::OnRespawnCallback()
+{
+	Destroy();
 }
 

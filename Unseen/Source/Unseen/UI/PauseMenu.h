@@ -18,6 +18,8 @@ class UNSEEN_API UPauseMenu : public UUserWidget
 public:
 	UPauseMenu(const FObjectInitializer& ObjectInitializer);
 
+	void InitialUI();
+
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	TObjectPtr<class UBorder> SRB1;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -49,6 +51,14 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	TObjectPtr<class UBorder> DHR5;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int ShootRateCnt;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int VerticalCnt;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int HorizontalCnt;
 
 	UFUNCTION(BlueprintCallable)
 	void FillSRB(int index);

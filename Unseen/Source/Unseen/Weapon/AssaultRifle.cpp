@@ -123,7 +123,7 @@ void AAssaultRifle::BeginPlay()
 	BulletSleeveAnimInstance = CastChecked<UWeaponAnimInstance>(BulletSleeve->GetAnimInstance());
 
 	CurrentAmmo = MaxAmmo;
-	ShootRate = 2.0f;
+	ShootRate = 1.0f;
 
 }
 
@@ -201,6 +201,11 @@ void AAssaultRifle::ShootWeaponNotHorizontalRecoil()
 FVector AAssaultRifle::GetMuzzlePos()
 {
 	return Silencer->GetSocketLocation(FName("Muzzle"));
+}
+
+void AAssaultRifle::RespawnCharacterSet(int WeaponCurAmmo, float _ShootRate, float CVR, float CHR, float HRA)
+{
+	Super::RespawnCharacterSet(WeaponCurAmmo, _ShootRate, CVR, CHR, HRA);
 }
 
 

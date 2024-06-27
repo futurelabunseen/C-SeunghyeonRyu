@@ -17,6 +17,8 @@ public:
 	// Sets default values for this component's properties
 	UProjectilePoolComponent_Base();
 
+	void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

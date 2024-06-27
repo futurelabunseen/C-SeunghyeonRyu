@@ -86,4 +86,7 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<class UProjectilePoolComponent_Base> ProjectilePool;
+
+	UFUNCTION()
+	virtual void RespawnCharacterSet(int WeaponCurAmmo, float _ShootRate, float CVR, float CHR, float HRA);
 };

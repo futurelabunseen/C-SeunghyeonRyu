@@ -222,6 +222,9 @@ public:
 	UPROPERTY()
 	uint8 bIsShooting : 1;
 
+	UPROPERTY()
+	uint8 bIsDead : 1;
+
 	UFUNCTION()
 	void StopRegenStamina();
 
@@ -242,6 +245,18 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<class UUnseenCharacterHUD> PlayerHUD;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UPauseMenu> PauseUIClass;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<class UPauseMenu> PauseMenuWidget;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> RestartUIClass;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<class UUserWidget> RestartUI;
 
 	// Weapon
 	UPROPERTY(EditAnywhere)
@@ -295,6 +310,10 @@ public:
 
 	UFUNCTION()
 	void OnDieCallback();
+
+	UFUNCTION()
+	void RespawnCharacterSet(int CurAmmo, float CurMoney, float SRCost, float VRCost, float HRCost, float BulletPrice, int WeaponCurAmmo, float ShootRate, float CVR, float CHR, float HRA, int SRCnt, int VRCnt, int HRCnt);
+
 protected:
 	UPROPERTY(EditAnywhere, Category = Animation)
 	TObjectPtr<class UAnimMontage> RifleMainBodyShootMontage;

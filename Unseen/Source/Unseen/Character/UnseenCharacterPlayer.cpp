@@ -15,6 +15,7 @@
 #include "UI/UnseenCharacterHUD.h"
 #include "Blueprint/UserWidget.h"
 #include "DrawDebugHelpers.h"
+#include "UI/PauseMenu.h"
 
 AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 {
@@ -38,7 +39,14 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	bIsSprinting = false;
 	bIsShooting = false;
 	bIsMoving = false;
+	bIsDead = false;
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> PauseUIClassRef(TEXT("/Game/UI/WBP_PauseMenu.WBP_PauseMenu_C"));
+	if (PauseUIClassRef.Class)
+	{
+		PauseUIClass = PauseUIClassRef.Class;
+	}
+	PauseMenuWidget = nullptr;
 	// HUD
 	static ConstructorHelpers::FClassFinder<UUserWidget> HUDClassRef(TEXT("/Game/UI/WBP_UnseenPlayerHUD.WBP_UnseenPlayerHUD_C"));
 	if (HUDClassRef.Class)
@@ -46,6 +54,13 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 		PlayerHUDClass = HUDClassRef.Class;
 	}
 	PlayerHUD = nullptr;
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> RestartUIClassRef(TEXT("/Game/UI/WBP_GameOver.WBP_GameOver_C"));
+	if (RestartUIClassRef.Class)
+	{
+		RestartUIClass = RestartUIClassRef.Class;
+	}
+	RestartUI = nullptr;
 
 	// Weapon
 	static ConstructorHelpers::FClassFinder<AActor> AssaultRifleBPClassRef(TEXT("/Game/Weapon/USBP_Assault_Rifle.USBP_Assault_Rifle_C"));
@@ -213,7 +228,8 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 	{
 		ASC = UnseenPlayerState->GetAbilitySystemComponent();
 		ASC->InitAbilityActorInfo(UnseenPlayerState, this);
-
+		AttributeSet = ASC->GetSet<UUnseenCharacterAttributeSet>();
+		
 		for (const auto& StartAbility : StartAbilities)
 		{
 			FGameplayAbilitySpec StartSpec(StartAbility);
@@ -228,12 +244,11 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 		}
 
 		SetupGASInputComponent();
-		AttributeSet = ASC->GetSet<UUnseenCharacterAttributeSet>();
-		//AttributeSet->OnDie.AddDynamic(this, &AUnseenCharacterPlayer::OnDieCallback); 왜 안 되지
+		const_cast<UUnseenCharacterAttributeSet*>(AttributeSet)->OnDie.AddDynamic(this, &AUnseenCharacterPlayer::OnDieCallback);
 	}
-	
-	//APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
-	//PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
+	//디버깅
+	APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
+	PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 
 	const UGameplayEffect* RegenStaminaEffectCDO = RegenStaminaEffect->GetDefaultObject<UGameplayEffect>();
 	ASC->ApplyGameplayEffectToSelf(RegenStaminaEffectCDO, 0, ASC->MakeEffectContext());
@@ -243,13 +258,28 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 void AUnseenCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
+	if (Controller == nullptr)
+	{
+		Controller = GetWorld()->GetFirstPlayerController();
+		Controller->Possess(this);
+	}
 	// Only for Player, So use CastChecked
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		//Subsystem->RemoveMappingContext(DefaultMappingContext);
+	}
+
+	if (PauseUIClass)
+	{
+		PauseMenuWidget = CreateWidget<UPauseMenu>(PlayerController, PauseUIClass);
+		if (nullptr != PauseMenuWidget)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("DDDDDDDDDD"));
+			PauseMenuWidget->AddToViewport();
+			PauseMenuWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 
 	if (PlayerHUDClass) // 멀티하면 IsLocallyControlled() 찾아보기
@@ -277,8 +307,8 @@ void AUnseenCharacterPlayer::BeginPlay()
 		}
 	}
 
-	//Test용
-	ChangeShootRate(1.0f);
+	ASC->SetNumericAttributeBase(AttributeSet->GetHpAttribute(), AttributeSet->GetMaxHp());
+	ASC->SetNumericAttributeBase(AttributeSet->GetStaminaAttribute(), AttributeSet->GetMaxStamina());
 
 	// Roll Movement Timeline
 	RollTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnRollMovementTimelineUpdated") });
@@ -676,7 +706,46 @@ bool AUnseenCharacterPlayer::IsCanReload()
 
 void AUnseenCharacterPlayer::OnDieCallback()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Die"));
+	if (!bIsDead)
+	{
+		bIsDead = true;
+		UE_LOG(LogTemp, Warning, TEXT("Die"));
+		//래그돌
+		GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+		GetMesh()->SetSimulatePhysics(true);
+
+		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+		if (RestartUIClass)
+		{
+			RestartUI = CreateWidget<UUserWidget>(PlayerController, RestartUIClass);
+			if (nullptr != RestartUI)
+			{
+				RestartUI->AddToViewport();
+			}
+		}
+	}
+}
+
+void AUnseenCharacterPlayer::RespawnCharacterSet(int CurAmmo, float CurMoney, float SRCost, float VRCost, float HRCost, float BulletPrice, int WeaponCurAmmo, float ShootRate, float CVR, float CHR, float HRA, int SRCnt, int VRCnt, int HRCnt)
+{
+	if (CurAmmo + WeaponCurAmmo < 30)
+	{
+		CurAmmo = 0;
+		WeaponCurAmmo = 30;
+	}
+
+	CharacterCurrentAmmo = CurAmmo;
+	Money = CurMoney;
+	ShootRateMoney = SRCost;
+	VerticalRecoilMoney = VRCost;
+	HorizontalRecoilMoney = HRCost;
+	BulletMoney = BulletPrice;
+	WeaponOnHand->RespawnCharacterSet(WeaponCurAmmo, ShootRate, CVR, CHR, HRA);
+	PauseMenuWidget->ShootRateCnt = SRCnt;
+	PauseMenuWidget->VerticalCnt = VRCnt;
+	PauseMenuWidget->HorizontalCnt = HRCnt;
+	PauseMenuWidget->InitialUI();
+	
 }
 
 void AUnseenCharacterPlayer::ChangeShootRate(float ShootRate)

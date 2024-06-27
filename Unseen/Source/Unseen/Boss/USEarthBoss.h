@@ -44,6 +44,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = AI)
 	class UBehaviorTree* BossBehaviorTree;
+	
+	/*UPROPERTY(EditAnywhere, Category = AI)
+	class UBehaviorTree* BossBehaviorTree;*/
+
 
 	UFUNCTION(BlueprintCallable)
 	void SetSkillPos();
@@ -54,4 +58,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	FVector SpawnedPos;
+
+	UFUNCTION()
+	void OnRespawnCallback();
 };

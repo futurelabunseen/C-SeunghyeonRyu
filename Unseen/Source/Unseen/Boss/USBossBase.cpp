@@ -46,6 +46,15 @@ void AUSBossBase::BeginPlay()
 
 }
 
+void AUSBossBase::Destroyed()
+{
+	BattleZone->Destroy();
+	if (nullptr != BossFightHUD)
+	{
+		BossFightHUD->RemoveFromParent();
+	}
+}
+
 // Called every frame
 void AUSBossBase::Tick(float DeltaTime)
 {

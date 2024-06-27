@@ -58,3 +58,12 @@ FVector AUnseenWeaponBase::GetMuzzlePos()
 	return FVector();
 }
 
+void AUnseenWeaponBase::RespawnCharacterSet(int WeaponCurAmmo, float _ShootRate, float CVR, float CHR, float HRA)
+{
+	CurrentAmmo = WeaponCurAmmo;
+	ShootRate = _ShootRate;
+	CurrentVerticalRecoil = CVR;
+	CurrentHorizontalRecoil = CHR;
+	HorizontalRecoilAmount = HRA;
+}
+
