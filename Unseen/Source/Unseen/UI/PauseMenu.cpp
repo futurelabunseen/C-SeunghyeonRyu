@@ -5,7 +5,9 @@
 
 UPauseMenu::UPauseMenu(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-
+	ShootRateCnt = 0;
+	VerticalCnt = 0;
+	HorizontalCnt = 0;
 }
 
 void UPauseMenu::InitialUI()

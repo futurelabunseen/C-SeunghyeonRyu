@@ -28,7 +28,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	//virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Tick(float DeltaTime) override;
 
 public:
@@ -312,7 +312,7 @@ public:
 	void OnDieCallback();
 
 	UFUNCTION()
-	void RespawnCharacterSet(int CurAmmo, float CurMoney, float SRCost, float VRCost, float HRCost, float BulletPrice, int WeaponCurAmmo, float ShootRate, float CVR, float CHR, float HRA, int SRCnt, int VRCnt, int HRCnt);
+	void RespawnCharacterSet();
 
 protected:
 	UPROPERTY(EditAnywhere, Category = Animation)

@@ -7,7 +7,7 @@
 #include "GameFramework/PlayerState.h"
 #include "UnseenGameModeBase.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRespawnDelegate);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRespawnDelegate);
 /**
  * 
  */
@@ -28,11 +28,11 @@ public:
 	UPROPERTY()
 	TObjectPtr<class APlayerController> PlayerController;
 
-	UFUNCTION()
-	void SpawnBoss();
-	UPROPERTY()
-	TSubclassOf<AActor> BossMonsterClass;
+	//UFUNCTION()
+	//void SpawnBoss();
+	//UPROPERTY()
+	//TSubclassOf<AActor> BossMonsterClass;
 
-	UPROPERTY(BlueprintAssignable)
-	FOnRespawnDelegate OnRespawn;
+	//UPROPERTY(BlueprintAssignable)
+	//FOnRespawnDelegate OnRespawn;
 };

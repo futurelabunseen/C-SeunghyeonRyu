@@ -36,7 +36,7 @@ public:
 	void ShootWeaponNotHorizontalRecoil() override;
 	FVector GetMuzzlePos() override;
 
-	void RespawnCharacterSet(int WeaponCurAmmo, float _ShootRate, float CVR, float CHR, float HRA) override;
+	//void RespawnCharacterSet(int WeaponCurAmmo, float _ShootRate, float CVR, float CHR, float HRA) override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon Parts", meta = (AllowPrivateAccess = "true"))

@@ -62,7 +62,7 @@ void AUSEarthBoss::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnedPos = GetActorLocation();
-	CastChecked<AUnseenGameModeBase>(GetWorld()->GetAuthGameMode())->OnRespawn.AddDynamic(this, &AUSEarthBoss::OnRespawnCallback);
+	//CastChecked<AUnseenGameModeBase>(GetWorld()->GetAuthGameMode())->OnRespawn.AddDynamic(this, &AUSEarthBoss::OnRespawnCallback);
 
 }
 
@@ -93,8 +93,8 @@ void AUSEarthBoss::SetSkillPos()
 	SkillPos = FVector(PlayerLocation.X + RandomValue1, PlayerLocation.Y + RandomValue2, PlayerLocation.Z);
 }
 
-void AUSEarthBoss::OnRespawnCallback()
-{
-	Destroy();
-}
+//void AUSEarthBoss::OnRespawnCallback()
+//{
+//	Destroy();
+//}
 

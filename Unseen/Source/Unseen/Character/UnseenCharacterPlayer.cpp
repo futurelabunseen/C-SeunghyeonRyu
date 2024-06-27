@@ -16,6 +16,7 @@
 #include "Blueprint/UserWidget.h"
 #include "DrawDebugHelpers.h"
 #include "UI/PauseMenu.h"
+#include "Game/UnseenGameInstance.h"
 
 AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 {
@@ -217,6 +218,7 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	VerticalRecoilMoney = 500.0f;
 	HorizontalRecoilMoney = 500.0f;
 	BulletMoney = 500.0f;
+
 }
 
 void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
@@ -244,11 +246,13 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 		}
 
 		SetupGASInputComponent();
+	
 		const_cast<UUnseenCharacterAttributeSet*>(AttributeSet)->OnDie.AddDynamic(this, &AUnseenCharacterPlayer::OnDieCallback);
 	}
+
 	//µð¹ö±ë
-	APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
-	PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
+	/*APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
+	PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));*/
 
 	const UGameplayEffect* RegenStaminaEffectCDO = RegenStaminaEffect->GetDefaultObject<UGameplayEffect>();
 	ASC->ApplyGameplayEffectToSelf(RegenStaminaEffectCDO, 0, ASC->MakeEffectContext());
@@ -258,11 +262,11 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 void AUnseenCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	if (Controller == nullptr)
+	/*if (Controller == nullptr)
 	{
 		Controller = GetWorld()->GetFirstPlayerController();
 		Controller->Possess(this);
-	}
+	}*/
 	// Only for Player, So use CastChecked
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -276,7 +280,6 @@ void AUnseenCharacterPlayer::BeginPlay()
 		PauseMenuWidget = CreateWidget<UPauseMenu>(PlayerController, PauseUIClass);
 		if (nullptr != PauseMenuWidget)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("DDDDDDDDDD"));
 			PauseMenuWidget->AddToViewport();
 			PauseMenuWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
@@ -306,9 +309,6 @@ void AUnseenCharacterPlayer::BeginPlay()
 			}
 		}
 	}
-
-	ASC->SetNumericAttributeBase(AttributeSet->GetHpAttribute(), AttributeSet->GetMaxHp());
-	ASC->SetNumericAttributeBase(AttributeSet->GetStaminaAttribute(), AttributeSet->GetMaxStamina());
 
 	// Roll Movement Timeline
 	RollTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnRollMovementTimelineUpdated") });
@@ -362,18 +362,23 @@ void AUnseenCharacterPlayer::BeginPlay()
 			}
 		}
 	}
+
+	RespawnCharacterSet();
+	ASC->SetNumericAttributeBase(AttributeSet->GetHpAttribute(), AttributeSet->GetMaxHp());
+	ASC->SetNumericAttributeBase(AttributeSet->GetStaminaAttribute(), AttributeSet->GetMaxStamina());
+	ASC->SetNumericAttributeBase(AttributeSet->GetShootRateAttribute(), WeaponOnHand->ShootRate);
 }
 
-void AUnseenCharacterPlayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	if (PlayerHUD)
-	{
-		PlayerHUD->RemoveFromParent();
-		PlayerHUD = nullptr;
-	}
-
-	Super::EndPlay(EndPlayReason);
-}
+//void AUnseenCharacterPlayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
+//{
+//	if (PlayerHUD)
+//	{
+//		PlayerHUD->RemoveFromParent();
+//		PlayerHUD = nullptr;
+//	}
+//
+//	Super::EndPlay(EndPlayReason);
+//}
 
 void AUnseenCharacterPlayer::Tick(float DeltaTime)
 {
@@ -726,24 +731,26 @@ void AUnseenCharacterPlayer::OnDieCallback()
 	}
 }
 
-void AUnseenCharacterPlayer::RespawnCharacterSet(int CurAmmo, float CurMoney, float SRCost, float VRCost, float HRCost, float BulletPrice, int WeaponCurAmmo, float ShootRate, float CVR, float CHR, float HRA, int SRCnt, int VRCnt, int HRCnt)
+void AUnseenCharacterPlayer::RespawnCharacterSet()
 {
-	if (CurAmmo + WeaponCurAmmo < 30)
+	UUnseenGameInstance* GI = CastChecked<UUnseenGameInstance>(GetWorld()->GetGameInstance());
+
+	if (GI->CurAmmo + GI->WeaponCurAmmo < 30)
 	{
-		CurAmmo = 0;
-		WeaponCurAmmo = 30;
+		GI->CurAmmo = 0;
+		GI->WeaponCurAmmo = 30;
 	}
 
-	CharacterCurrentAmmo = CurAmmo;
-	Money = CurMoney;
-	ShootRateMoney = SRCost;
-	VerticalRecoilMoney = VRCost;
-	HorizontalRecoilMoney = HRCost;
-	BulletMoney = BulletPrice;
-	WeaponOnHand->RespawnCharacterSet(WeaponCurAmmo, ShootRate, CVR, CHR, HRA);
-	PauseMenuWidget->ShootRateCnt = SRCnt;
-	PauseMenuWidget->VerticalCnt = VRCnt;
-	PauseMenuWidget->HorizontalCnt = HRCnt;
+	CharacterCurrentAmmo = GI->CurAmmo;
+	Money = GI->CurMoney;
+	ShootRateMoney = GI->SRCost;
+	VerticalRecoilMoney = GI->VRCost;
+	HorizontalRecoilMoney = GI->HRCost;
+	BulletMoney = GI->BulletPrice;
+	WeaponOnHand->RespawnCharacterSet(GI->WeaponCurAmmo, GI->ShootRate, GI->CVR, GI->CHR, GI->HRA);
+	PauseMenuWidget->ShootRateCnt = GI->SRCnt;
+	PauseMenuWidget->VerticalCnt = GI->VRCnt;
+	PauseMenuWidget->HorizontalCnt = GI->HRCnt;
 	PauseMenuWidget->InitialUI();
 	
 }
