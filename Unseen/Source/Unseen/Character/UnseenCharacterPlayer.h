@@ -246,17 +246,17 @@ public:
 	UPROPERTY()
 	TObjectPtr<class UUnseenCharacterHUD> PlayerHUD;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UPauseMenu> PauseUIClass;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UPauseMenu> PauseMenuWidget;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UUserWidget> RestartUIClass;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UGameOver> RestartUIClass;
 
-	UPROPERTY(BlueprintReadWrite)
-	TObjectPtr<class UUserWidget> RestartUI;
+	UPROPERTY()
+	TObjectPtr<class UGameOver> RestartUI;
 
 	// Weapon
 	UPROPERTY(EditAnywhere)

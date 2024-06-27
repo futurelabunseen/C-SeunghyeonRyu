@@ -16,6 +16,7 @@
 #include "Blueprint/UserWidget.h"
 #include "DrawDebugHelpers.h"
 #include "UI/PauseMenu.h"
+#include "UI/GameOver.h"
 #include "Game/UnseenGameInstance.h"
 
 AUnseenCharacterPlayer::AUnseenCharacterPlayer()
@@ -56,12 +57,12 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	}
 	PlayerHUD = nullptr;
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> RestartUIClassRef(TEXT("/Game/UI/WBP_GameOver.WBP_GameOver_C"));
+	/*static ConstructorHelpers::FClassFinder<UUserWidget> RestartUIClassRef(TEXT("/Game/UI/WBP_GameOverUI.WBP_GameOverUI_C"));
 	if (RestartUIClassRef.Class)
 	{
 		RestartUIClass = RestartUIClassRef.Class;
 	}
-	RestartUI = nullptr;
+	RestartUI = nullptr;*/
 
 	// Weapon
 	static ConstructorHelpers::FClassFinder<AActor> AssaultRifleBPClassRef(TEXT("/Game/Weapon/USBP_Assault_Rifle.USBP_Assault_Rifle_C"));
@@ -722,10 +723,12 @@ void AUnseenCharacterPlayer::OnDieCallback()
 		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 		if (RestartUIClass)
 		{
-			RestartUI = CreateWidget<UUserWidget>(PlayerController, RestartUIClass);
+			RestartUI = CreateWidget<UGameOver>(PlayerController, RestartUIClass);
 			if (nullptr != RestartUI)
 			{
 				RestartUI->AddToViewport();
+				PlayerController->SetInputMode(FInputModeUIOnly());
+				PlayerController->SetShowMouseCursor(true);
 			}
 		}
 	}

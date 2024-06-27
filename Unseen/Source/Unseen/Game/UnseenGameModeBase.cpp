@@ -7,7 +7,6 @@
 #include "Character/UnseenCharacterPlayer.h"
 #include "Game/UnseenGameInstance.h"
 #include "UI/PauseMenu.h"
-//#include "GameFramework/PlayerStart.h"
 
 AUnseenGameModeBase::AUnseenGameModeBase()
 {
@@ -29,26 +28,15 @@ AUnseenGameModeBase::AUnseenGameModeBase()
 	{
 		PlayerStateClass = PlayerStateClassRef.Class;
 	}
-	PlayerController = nullptr;
 
-	/*static ConstructorHelpers::FClassFinder<AActor> BossClassRef(TEXT("/Game/Boss/BP_USEarthBoss.BP_USEarthBoss_C"));
-	if (BossClassRef.Class)
-	{
-		BossMonsterClass = BossClassRef.Class;
-	}*/
 }
 
 
 
 void AUnseenGameModeBase::RespawnPlayer()
 {
-	/*OnRespawn.Broadcast();*/
-	/*SpawnBoss();*/
-	PlayerController = GetWorld()->GetFirstPlayerController();
-	AUnseenCharacterPlayer* PlayerCharacter = CastChecked<AUnseenCharacterPlayer>(PlayerController->GetCharacter());
-	/*AActor* PlayerStart = FindPlayerStart(PlayerController);
-	FVector PlayerStartPos = PlayerStart->GetActorLocation();
-	FRotator PlayerStartRot = PlayerStart->GetActorRotation();*/
+	PC = GetWorld()->GetFirstPlayerController();
+	AUnseenCharacterPlayer* PlayerCharacter = CastChecked<AUnseenCharacterPlayer>(PC->GetCharacter());
 
 	if (PlayerCharacter)
 	{
@@ -71,17 +59,6 @@ void AUnseenGameModeBase::RespawnPlayer()
 
 		CastChecked<UUnseenGameInstance>(GetWorld()->GetGameInstance())->SetRespawnSet(a, b, c, d, e, f, g, h, i, j, k, l, m, n);
 
-		//AUnseenCharacterPlayer* NewCharacter = GetWorld()->SpawnActor<AUnseenCharacterPlayer>(DefaultPawnClass, PlayerStartPos, PlayerStartRot);
-		//PlayerCharacter->UnPossessed();
-		//PlayerCharacter->RestartUI->RemoveFromParent();
-		//PlayerController->SetInputMode(FInputModeGameOnly());
-		//PlayerController->SetShowMouseCursor(false);
-		//PlayerCharacter->GetWeaponOnHand()->ProjectilePool->DestroyComponent();
-		//PlayerCharacter->GetWeaponOnHand()->Destroy();
-		//PlayerCharacter->Destroy();
-		////PlayerController->Possess(NewCharacter);
-		//
-		//NewCharacter->RespawnCharacterSet(a, b, c, d, e, f, g, h, i, j, k, l, m, n);
 		UWorld* World = GetWorld();
 		if (World)
 		{
@@ -117,10 +94,3 @@ void AUnseenGameModeBase::RestartGame()
 		UGameplayStatics::OpenLevel(World, CurrentLevelName);
 	}
 }
-
-//void AUnseenGameModeBase::SpawnBoss()
-//{
-//	FVector BossPos = FVector(3200.f, 0.f, 88.f);
-//	FRotator BossRot = FRotator(0.f, 180.f, 0.f);
-//	GetWorld()->SpawnActor<AActor>(BossMonsterClass, BossPos, BossRot);
-//}

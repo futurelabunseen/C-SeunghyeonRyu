@@ -26,13 +26,6 @@ public:
 	void RestartGame();
 
 	UPROPERTY()
-	TObjectPtr<class APlayerController> PlayerController;
+	TObjectPtr<class APlayerController> PC;
 
-	//UFUNCTION()
-	//void SpawnBoss();
-	//UPROPERTY()
-	//TSubclassOf<AActor> BossMonsterClass;
-
-	//UPROPERTY(BlueprintAssignable)
-	//FOnRespawnDelegate OnRespawn;
 };

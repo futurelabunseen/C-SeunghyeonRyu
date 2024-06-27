@@ -14,9 +14,7 @@ class UNSEEN_API UUnseenGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 	
-	//Respawn
 public:
-
 	UUnseenGameInstance();
 
 	UPROPERTY()
