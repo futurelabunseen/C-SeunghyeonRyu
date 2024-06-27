@@ -108,6 +108,8 @@ AAssaultRifle::AAssaultRifle()
 	CurrentVerticalRecoil = MaxVerticalRecoil;
 	CurrentHorizontalRecoil = 0.0f;
 	HorizontalRecoilAmount = 4.0f; // 1
+	CurrentAmmo = MaxAmmo;
+	ShootRate = 1.0f;
 
 	ProjectilePool = CreateDefaultSubobject<UPoolComponent_AssaultRifle>(TEXT("ProjectilePool"));
 
@@ -122,8 +124,6 @@ void AAssaultRifle::BeginPlay()
 	MagazineAnimInstance = CastChecked<UWeaponAnimInstance>(Magazine->GetAnimInstance());
 	BulletSleeveAnimInstance = CastChecked<UWeaponAnimInstance>(BulletSleeve->GetAnimInstance());
 
-	CurrentAmmo = MaxAmmo;
-	ShootRate = 2.0f;
 
 }
 
@@ -202,5 +202,10 @@ FVector AAssaultRifle::GetMuzzlePos()
 {
 	return Silencer->GetSocketLocation(FName("Muzzle"));
 }
+
+//void AAssaultRifle::RespawnCharacterSet(int WeaponCurAmmo, float _ShootRate, float CVR, float CHR, float HRA)
+//{
+//	Super::RespawnCharacterSet(WeaponCurAmmo, _ShootRate, CVR, CHR, HRA);
+//}
 
 

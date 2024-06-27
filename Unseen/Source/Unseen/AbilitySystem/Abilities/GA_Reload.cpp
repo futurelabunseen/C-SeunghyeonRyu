@@ -60,7 +60,10 @@ void UGA_Reload::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	{
 		AnimInstance->Montage_Stop(0.0f, ReloadMontage);
 	}
-	AudioComponent->Stop();
+	if (AudioComponent)
+	{
+		AudioComponent->Stop();
+	}
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 

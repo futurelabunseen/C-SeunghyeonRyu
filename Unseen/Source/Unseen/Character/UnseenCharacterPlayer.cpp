@@ -15,6 +15,8 @@
 #include "UI/UnseenCharacterHUD.h"
 #include "Blueprint/UserWidget.h"
 #include "DrawDebugHelpers.h"
+#include "UI/PauseMenu.h"
+#include "Game/UnseenGameInstance.h"
 
 AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 {
@@ -38,7 +40,14 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	bIsSprinting = false;
 	bIsShooting = false;
 	bIsMoving = false;
+	bIsDead = false;
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> PauseUIClassRef(TEXT("/Game/UI/WBP_PauseMenu.WBP_PauseMenu_C"));
+	if (PauseUIClassRef.Class)
+	{
+		PauseUIClass = PauseUIClassRef.Class;
+	}
+	PauseMenuWidget = nullptr;
 	// HUD
 	static ConstructorHelpers::FClassFinder<UUserWidget> HUDClassRef(TEXT("/Game/UI/WBP_UnseenPlayerHUD.WBP_UnseenPlayerHUD_C"));
 	if (HUDClassRef.Class)
@@ -46,6 +55,13 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 		PlayerHUDClass = HUDClassRef.Class;
 	}
 	PlayerHUD = nullptr;
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> RestartUIClassRef(TEXT("/Game/UI/WBP_GameOver.WBP_GameOver_C"));
+	if (RestartUIClassRef.Class)
+	{
+		RestartUIClass = RestartUIClassRef.Class;
+	}
+	RestartUI = nullptr;
 
 	// Weapon
 	static ConstructorHelpers::FClassFinder<AActor> AssaultRifleBPClassRef(TEXT("/Game/Weapon/USBP_Assault_Rifle.USBP_Assault_Rifle_C"));
@@ -202,6 +218,7 @@ AUnseenCharacterPlayer::AUnseenCharacterPlayer()
 	VerticalRecoilMoney = 500.0f;
 	HorizontalRecoilMoney = 500.0f;
 	BulletMoney = 500.0f;
+
 }
 
 void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
@@ -213,7 +230,8 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 	{
 		ASC = UnseenPlayerState->GetAbilitySystemComponent();
 		ASC->InitAbilityActorInfo(UnseenPlayerState, this);
-
+		AttributeSet = ASC->GetSet<UUnseenCharacterAttributeSet>();
+		
 		for (const auto& StartAbility : StartAbilities)
 		{
 			FGameplayAbilitySpec StartSpec(StartAbility);
@@ -228,12 +246,13 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 		}
 
 		SetupGASInputComponent();
-		AttributeSet = ASC->GetSet<UUnseenCharacterAttributeSet>();
-		//AttributeSet->OnDie.AddDynamic(this, &AUnseenCharacterPlayer::OnDieCallback); 왜 안 되지
-	}
 	
-	//APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
-	//PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
+		const_cast<UUnseenCharacterAttributeSet*>(AttributeSet)->OnDie.AddDynamic(this, &AUnseenCharacterPlayer::OnDieCallback);
+	}
+
+	//디버깅
+	/*APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
+	PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));*/
 
 	const UGameplayEffect* RegenStaminaEffectCDO = RegenStaminaEffect->GetDefaultObject<UGameplayEffect>();
 	ASC->ApplyGameplayEffectToSelf(RegenStaminaEffectCDO, 0, ASC->MakeEffectContext());
@@ -243,13 +262,27 @@ void AUnseenCharacterPlayer::PossessedBy(AController* NewController)
 void AUnseenCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
+	/*if (Controller == nullptr)
+	{
+		Controller = GetWorld()->GetFirstPlayerController();
+		Controller->Possess(this);
+	}*/
 	// Only for Player, So use CastChecked
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		//Subsystem->RemoveMappingContext(DefaultMappingContext);
+	}
+
+	if (PauseUIClass)
+	{
+		PauseMenuWidget = CreateWidget<UPauseMenu>(PlayerController, PauseUIClass);
+		if (nullptr != PauseMenuWidget)
+		{
+			PauseMenuWidget->AddToViewport();
+			PauseMenuWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 
 	if (PlayerHUDClass) // 멀티하면 IsLocallyControlled() 찾아보기
@@ -276,9 +309,6 @@ void AUnseenCharacterPlayer::BeginPlay()
 			}
 		}
 	}
-
-	//Test용
-	ChangeShootRate(1.0f);
 
 	// Roll Movement Timeline
 	RollTimeLineInterpFunction.BindUFunction(this, FName{ TEXT("OnRollMovementTimelineUpdated") });
@@ -332,18 +362,23 @@ void AUnseenCharacterPlayer::BeginPlay()
 			}
 		}
 	}
+
+	RespawnCharacterSet();
+	ASC->SetNumericAttributeBase(AttributeSet->GetHpAttribute(), AttributeSet->GetMaxHp());
+	ASC->SetNumericAttributeBase(AttributeSet->GetStaminaAttribute(), AttributeSet->GetMaxStamina());
+	ASC->SetNumericAttributeBase(AttributeSet->GetShootRateAttribute(), WeaponOnHand->ShootRate);
 }
 
-void AUnseenCharacterPlayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	if (PlayerHUD)
-	{
-		PlayerHUD->RemoveFromParent();
-		PlayerHUD = nullptr;
-	}
-
-	Super::EndPlay(EndPlayReason);
-}
+//void AUnseenCharacterPlayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
+//{
+//	if (PlayerHUD)
+//	{
+//		PlayerHUD->RemoveFromParent();
+//		PlayerHUD = nullptr;
+//	}
+//
+//	Super::EndPlay(EndPlayReason);
+//}
 
 void AUnseenCharacterPlayer::Tick(float DeltaTime)
 {
@@ -676,7 +711,48 @@ bool AUnseenCharacterPlayer::IsCanReload()
 
 void AUnseenCharacterPlayer::OnDieCallback()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Die"));
+	if (!bIsDead)
+	{
+		bIsDead = true;
+		UE_LOG(LogTemp, Warning, TEXT("Die"));
+		//래그돌
+		GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+		GetMesh()->SetSimulatePhysics(true);
+
+		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+		if (RestartUIClass)
+		{
+			RestartUI = CreateWidget<UUserWidget>(PlayerController, RestartUIClass);
+			if (nullptr != RestartUI)
+			{
+				RestartUI->AddToViewport();
+			}
+		}
+	}
+}
+
+void AUnseenCharacterPlayer::RespawnCharacterSet()
+{
+	UUnseenGameInstance* GI = CastChecked<UUnseenGameInstance>(GetWorld()->GetGameInstance());
+
+	if (GI->CurAmmo + GI->WeaponCurAmmo < 30)
+	{
+		GI->CurAmmo = 0;
+		GI->WeaponCurAmmo = 30;
+	}
+
+	CharacterCurrentAmmo = GI->CurAmmo;
+	Money = GI->CurMoney;
+	ShootRateMoney = GI->SRCost;
+	VerticalRecoilMoney = GI->VRCost;
+	HorizontalRecoilMoney = GI->HRCost;
+	BulletMoney = GI->BulletPrice;
+	WeaponOnHand->RespawnCharacterSet(GI->WeaponCurAmmo, GI->ShootRate, GI->CVR, GI->CHR, GI->HRA);
+	PauseMenuWidget->ShootRateCnt = GI->SRCnt;
+	PauseMenuWidget->VerticalCnt = GI->VRCnt;
+	PauseMenuWidget->HorizontalCnt = GI->HRCnt;
+	PauseMenuWidget->InitialUI();
+	
 }
 
 void AUnseenCharacterPlayer::ChangeShootRate(float ShootRate)

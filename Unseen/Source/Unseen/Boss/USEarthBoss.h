@@ -54,4 +54,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	FVector SpawnedPos;
+
+	/*UFUNCTION()
+	void OnRespawnCallback();*/
 };

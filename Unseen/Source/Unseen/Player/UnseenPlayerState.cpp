@@ -17,5 +17,3 @@ UAbilitySystemComponent* AUnseenPlayerState::GetAbilitySystemComponent() const
 {
 	return ASC;
 }
-
-

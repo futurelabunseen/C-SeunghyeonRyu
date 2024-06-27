@@ -10,6 +10,17 @@ UProjectilePoolComponent_Base::UProjectilePoolComponent_Base()
 	ExpandSize = 0;
 }
 
+void UProjectilePoolComponent_Base::OnComponentDestroyed(bool bDestroyingHierarchy)
+{
+	for (AUS_ProjectileBase* Projectile : Pool)
+	{
+		if (Projectile)
+		{
+			Projectile->Destroy();
+		}
+	}
+}
+
 
 // Called when the game starts
 void UProjectilePoolComponent_Base::BeginPlay()
