@@ -84,6 +84,7 @@ void AUSBossBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 void AUSBossBase::LimitBattleZone()
 {
 	PlayerCharacterPtr = CastChecked<AUnseenCharacterPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	OnClear.AddDynamic(PlayerCharacterPtr, &AUnseenCharacterPlayer::OnClearCallback);
 	UE_LOG(LogTemp, Warning, TEXT("Create Battle Zone"));
 	// 벽 동그랗게 만들어둔 액터 스폰
 	if (BossFightHUDClass)
@@ -122,7 +123,8 @@ float AUSBossBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 		{
 			CurrentHp = 0;
 			UE_LOG(LogTemp, Warning, TEXT("Boss Die"));
-			
+			OnClear.Broadcast();
+
 			if (BossFightHUD)
 			{
 				BossFightHUD->RemoveFromParent();

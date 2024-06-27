@@ -17,6 +17,7 @@
 #include "DrawDebugHelpers.h"
 #include "UI/PauseMenu.h"
 #include "UI/GameOver.h"
+#include "UI/GameClearUI.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "Game/UnseenGameInstance.h"
@@ -727,6 +728,7 @@ void AUnseenCharacterPlayer::OnDieCallback()
 		
 		GetSpringArmComponent()->TargetArmLength = 500;
 		GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+		ASC->ClearAllAbilities();
 		GetCharacterMovement()->DisableMovement();
 		GetMesh()->SetSimulatePhysics(true);
 
@@ -741,6 +743,28 @@ void AUnseenCharacterPlayer::OnDieCallback()
 				PlayerController->SetInputMode(FInputModeUIOnly());
 				PlayerController->SetShowMouseCursor(true);
 			}
+		}
+	}
+}
+
+void AUnseenCharacterPlayer::OnClearCallback()
+{
+	ASC->ClearAllAbilities();
+	GetCharacterMovement()->DisableMovement();
+	GetMesh()->SetSimulatePhysics(false);
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	PlayerController->SetIgnoreMoveInput(true);
+	PlayerController->SetIgnoreLookInput(true);
+	InputComponent->Deactivate();
+
+	if (ClearUIClass)
+	{
+		ClearUI = CreateWidget<UGameClearUI>(PlayerController, ClearUIClass);
+		if (nullptr != ClearUI)
+		{
+			ClearUI->AddToViewport();
+			PlayerController->SetInputMode(FInputModeUIOnly());
+			PlayerController->SetShowMouseCursor(true);
 		}
 	}
 }

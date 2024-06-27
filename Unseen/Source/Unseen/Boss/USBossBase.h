@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "USBossBase.generated.h"
 
-class USoundCue;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnClearDelegate);
 
 UCLASS()
 class UNSEEN_API AUSBossBase : public ACharacter
@@ -16,6 +16,9 @@ class UNSEEN_API AUSBossBase : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AUSBossBase();
+
+	UPROPERTY(BlueprintAssignable)
+	FOnClearDelegate OnClear;
 
 protected:
 	// Called when the game starts or when spawned
@@ -59,8 +62,8 @@ public:
 	TObjectPtr<class AUnseenCharacterPlayer> PlayerCharacterPtr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = true))
-	USoundCue* HitSound;
+	TObjectPtr<class USoundCue> HitSound;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = true))
-	USoundCue* CriticalHitSound;
+	TObjectPtr<class USoundCue> CriticalHitSound;
 };

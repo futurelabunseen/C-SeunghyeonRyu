@@ -258,6 +258,12 @@ public:
 	UPROPERTY()
 	TObjectPtr<class UGameOver> RestartUI;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UGameClearUI> ClearUIClass;
+
+	UPROPERTY()
+	TObjectPtr<class UGameClearUI> ClearUI;
+
 	// Weapon
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AAssaultRifle> AssaultRifleBPClass;
@@ -310,6 +316,9 @@ public:
 
 	UFUNCTION()
 	void OnDieCallback();
+
+	UFUNCTION()
+	void OnClearCallback();
 
 	UFUNCTION()
 	void RespawnCharacterSet();
