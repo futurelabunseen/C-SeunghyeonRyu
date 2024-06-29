@@ -25,7 +25,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RestartGame();
 
+	UFUNCTION(BlueprintCallable)
+	void Restart();
+
 	UPROPERTY()
 	TObjectPtr<class APlayerController> PC;
+
+	UPROPERTY()
+	uint8 bIsRestart : 1;
 
 };

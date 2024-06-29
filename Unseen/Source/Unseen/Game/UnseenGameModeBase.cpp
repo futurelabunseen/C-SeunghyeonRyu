@@ -7,6 +7,7 @@
 #include "Character/UnseenCharacterPlayer.h"
 #include "Game/UnseenGameInstance.h"
 #include "UI/PauseMenu.h"
+#include "TimerManager.h"
 
 AUnseenGameModeBase::AUnseenGameModeBase()
 {
@@ -28,7 +29,7 @@ AUnseenGameModeBase::AUnseenGameModeBase()
 	{
 		PlayerStateClass = PlayerStateClassRef.Class;
 	}
-
+	bIsRestart = false;
 }
 
 
@@ -59,12 +60,15 @@ void AUnseenGameModeBase::RespawnPlayer()
 
 		CastChecked<UUnseenGameInstance>(GetWorld()->GetGameInstance())->SetRespawnSet(a, b, c, d, e, f, g, h, i, j, k, l, m, n);
 
-		UWorld* World = GetWorld();
-		if (World)
+		Restart();
+		/*FTimerHandle TimerHandle;
+		float DelayDuration = 1.0f;
+		if (!bIsRestart)
 		{
-			FName CurrentLevelName = FName(World->GetMapName());
-			UGameplayStatics::OpenLevel(World, CurrentLevelName);
-		}
+			bIsRestart = true;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AUnseenGameModeBase::Restart, DelayDuration, false);
+		}*/
+	
 	}
 }
 
@@ -87,6 +91,20 @@ void AUnseenGameModeBase::RestartGame()
 
 	CastChecked<UUnseenGameInstance>(GetWorld()->GetGameInstance())->SetRespawnSet(a, b, c, d, e, f, g, h, i, j, k, l, m, n);
 
+	Restart();
+
+	/*FTimerHandle TimerHandle;
+	float DelayDuration = 1.0f;
+
+	if (!bIsRestart)
+	{
+		bIsRestart = true;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AUnseenGameModeBase::Restart, DelayDuration, false);
+	}*/
+}
+
+void AUnseenGameModeBase::Restart()
+{
 	UWorld* World = GetWorld();
 	if (World)
 	{

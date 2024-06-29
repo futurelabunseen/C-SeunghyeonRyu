@@ -65,6 +65,16 @@ void UGA_Shoot::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGa
 {
 	AUnseenCharacterPlayer* UnseenCharacter = CastChecked<AUnseenCharacterPlayer>(ActorInfo->AvatarActor.Get());
 	UnseenCharacter->bIsShooting = false;
+	if (UnseenCharacter->bIsDead)
+	{
+		UAnimInstance* AnimInstance = ActorInfo->GetAnimInstance();
+		UAnimMontage* ShootMontage = UnseenCharacter->GetShootingMontage();
+		if (AnimInstance->Montage_IsActive(ShootMontage))
+		{
+			AnimInstance->Montage_Stop(0.0f, ShootMontage);
+			UE_LOG(LogTemp, Warning, TEXT("DDDD"));
+		}
+	}
 
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }

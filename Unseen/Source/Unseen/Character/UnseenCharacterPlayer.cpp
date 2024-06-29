@@ -728,12 +728,17 @@ void AUnseenCharacterPlayer::OnDieCallback()
 		
 		GetSpringArmComponent()->TargetArmLength = 500;
 		GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+		PlayerController->DisableInput(PlayerController);
+		InputComponent->Deactivate();
+		ASC->CancelAllAbilities();
 		ASC->ClearAllAbilities();
 		GetCharacterMovement()->DisableMovement();
 		GetMesh()->SetSimulatePhysics(true);
+		PlayerController->SetIgnoreMoveInput(true);
+		PlayerController->SetIgnoreLookInput(true);
 
 
-		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 		if (RestartUIClass)
 		{
 			RestartUI = CreateWidget<UGameOver>(PlayerController, RestartUIClass);
@@ -749,13 +754,15 @@ void AUnseenCharacterPlayer::OnDieCallback()
 
 void AUnseenCharacterPlayer::OnClearCallback()
 {
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	PlayerController->DisableInput(PlayerController);
+	InputComponent->Deactivate();
+	ASC->CancelAllAbilities();
 	ASC->ClearAllAbilities();
 	GetCharacterMovement()->DisableMovement();
 	GetMesh()->SetSimulatePhysics(false);
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	PlayerController->SetIgnoreMoveInput(true);
 	PlayerController->SetIgnoreLookInput(true);
-	InputComponent->Deactivate();
 
 	if (ClearUIClass)
 	{
