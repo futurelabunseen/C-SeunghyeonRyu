@@ -49,8 +49,8 @@ void AUS_ProjectileBase::PushPoolSelf()
 	{
 		return;
 	}
-	ProjectilePool->PushProjectileInPool(this);
 	SetProjectileActive(false);
+	ProjectilePool->PushProjectileInPool(this);
 	UE_LOG(LogTemp, Warning, TEXT("Pool Self : %d"), ProjectilePool->Pool.Num());
 }
 

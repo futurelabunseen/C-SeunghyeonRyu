@@ -29,7 +29,7 @@ public:
 	UFUNCTION()
 	AUS_ProjectileBase* PullProjectile();
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TArray<AUS_ProjectileBase*> Pool;
 protected:
 

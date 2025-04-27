@@ -62,6 +62,7 @@ void UProjectilePoolComponent_Base::Expand()
 		{
 			AUS_ProjectileBase* SpawnedProjectile = GetWorld()->SpawnActor<AUS_ProjectileBase>(PooledObjectClass, FVector().ZeroVector, FRotator().ZeroRotator);
 			SpawnedProjectile->SetProjectileActive(false);
+			SpawnedProjectile->ProjectilePool = this;
 			Pool.Push(SpawnedProjectile);
 		}
 	}

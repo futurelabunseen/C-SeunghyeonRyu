@@ -361,5 +361,4 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = true))
 	TObjectPtr<class USoundCue> GameOverSound;
-
 };
